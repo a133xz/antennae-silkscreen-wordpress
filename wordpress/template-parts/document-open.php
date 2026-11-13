@@ -9,5 +9,5 @@ $ss_body_class = isset($ss_body_class) ? $ss_body_class : '';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
 </head>
-<body <?php body_class('silkscreen-theme ' . $ss_body_class); ?><?php echo $ss_surface !== '' ? ' style="--ss-surface:' . esc_attr($ss_surface) . '"' : ''; ?>>
+<body <?php body_class('silkscreen-theme ' . $ss_body_class); ?><?php echo $ss_surface !== '' ? ' style="--ss-surface:' . esc_attr($ss_surface) . ';--canvas:' . esc_attr($ss_surface) . '"' : ''; ?>>
 <?php wp_body_open(); ?>

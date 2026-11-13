@@ -216,11 +216,13 @@ body.silkscreen-theme a:visited {
   background: var(--paper);
 }
 
-[data-site-header][data-fix-mobile-header] {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
+@media (max-width: 1299px) {
+  [data-site-header][data-fix-mobile-header] {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
 }
 
 [data-site-header][data-header-settling] {
@@ -815,10 +817,12 @@ html[data-about-active] [data-header-fill] {
   }
 }
 
-.ss-news-grid .col-3 { grid-column: span 3; }
-.ss-news-grid .col-4 { grid-column: span 4; }
-.ss-news-grid .col-5 { grid-column: span 5; }
-.ss-news-grid .col-6 { grid-column: span 6; }
+@media (min-width: 768px) {
+  .ss-news-grid .col-3 { grid-column: span 3; }
+  .ss-news-grid .col-4 { grid-column: span 4; }
+  .ss-news-grid .col-5 { grid-column: span 5; }
+  .ss-news-grid .col-6 { grid-column: span 6; }
+}
 
 .ss-news-card img {
   display: block;
@@ -851,6 +855,7 @@ html[data-about-active] [data-header-fill] {
 .ss-news-card__title {
   margin: 15px 0 0;
   font-size: var(--text-title-sm);
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 29px;
@@ -924,6 +929,17 @@ html[data-about-active] [data-header-fill] {
 
 .footer-tail { padding-bottom: 200px; }
 
+.ss-page-content--news {
+  padding-top: 2.5rem;
+  padding-bottom: 200px;
+}
+
+@media (min-width: 768px) {
+  .ss-page-content--news {
+    padding-top: 150px;
+  }
+}
+
 /* Projects index pile */
 .ss-projects-pile { display: none; }
 
@@ -959,11 +975,93 @@ html[data-about-active] [data-header-fill] {
   grid-column: 2;
 }
 
-/* Shop */
+/* Shop index — Figma 68:198, matches shop/page.tsx + ProductCard poster captions */
+.ss-shop-backdrop {
+  pointer-events: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100lvh;
+  min-height: 100svh;
+  background-color: #000;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+@media (min-width: 1300px) {
+  .ss-shop-backdrop {
+    inset: 0;
+    height: auto;
+  }
+}
+
+.ss-page-content--shop {
+  position: relative;
+  padding-top: 2.5rem;
+  padding-bottom: 200px;
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .ss-page-content--shop {
+    padding-top: 150px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ss-page-content--shop {
+    padding-bottom: 350px;
+  }
+}
+
 .ss-shop-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  column-gap: 2rem;
+  row-gap: 5rem;
+}
+
+@media (min-width: 640px) {
+  .ss-shop-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .ss-shop-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ss-shop-product {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ss-shop-product__frame {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  width: 100%;
+  max-width: 24rem;
+  align-items: flex-end;
+  justify-content: center;
+  height: 350px;
+}
+
+.ss-shop-product__frame img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .ss-product-card__price {
