@@ -1601,6 +1601,7 @@ html[data-about-active] .ss-about-content {
 .ss-project-title {
   margin: 0;
   font-weight: 400;
+  text-transform: uppercase;
   letter-spacing: -0.03em;
   line-height: 1.07;
   font-size: clamp(1.5rem, 2.2vw, 2.5rem);
