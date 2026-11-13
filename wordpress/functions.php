@@ -8,6 +8,7 @@ require get_template_directory() . '/inc/projects.php';
 require get_template_directory() . '/inc/news.php';
 require get_template_directory() . '/inc/shop.php';
 require get_template_directory() . '/inc/fields.php';
+require get_template_directory() . '/inc/admin-cleanup.php';
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
