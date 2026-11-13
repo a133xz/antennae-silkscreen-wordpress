@@ -548,6 +548,23 @@ html[data-about-active] [data-header-fill] {
   line-height: 1;
 }
 
+.ss-footer__sep {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .ss-footer__meta {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .ss-footer__sep {
+    display: inline;
+    flex-shrink: 0;
+  }
+}
+
 .ss-footer__meta p {
   margin: 0;
 }
