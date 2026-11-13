@@ -9,7 +9,7 @@ $count = count($projects);
 <ul class="ss-projects-mobile">
     <?php foreach ($projects as $project) : ?>
         <li>
-            <?php get_template_part('template-parts/project-card', null, array('project' => $project, 'title_tag' => 'h3')); ?>
+            <?php get_template_part('template-parts/project-card', null, array('project' => $project, 'title_tag' => 'h3', 'home_featured' => true)); ?>
         </li>
     <?php endforeach; ?>
 </ul>
@@ -17,17 +17,17 @@ $count = count($projects);
     <?php foreach ($projects as $index => $project) : ?>
         <div class="ss-pile-title-cell" data-pile-index="<?php echo (int) $index; ?>">
             <div class="ss-pile-title" data-pile-sticky>
-                <a href="<?php echo esc_url($project['permalink']); ?>" class="font-display type-heading-fluid uppercase" style="text-decoration:none;color:inherit;display:block">
-                    <span class="block"><?php echo esc_html($project['title']); ?></span>
+                <a href="<?php echo esc_url($project['permalink']); ?>" class="ss-pile-title__link">
+                    <h2 class="ss-pile-title__name font-display type-heading-fluid"><?php echo esc_html($project['title']); ?></h2>
                     <?php if (!empty($project['director'])) : ?>
-                        <span class="ss-directed block" style="margin-top:7px"><em>Directed by </em><?php echo esc_html($project['director']); ?></span>
+                        <p class="ss-directed"><em>Directed by </em><?php echo esc_html($project['director']); ?></p>
                     <?php endif; ?>
                 </a>
             </div>
         </div>
     <?php endforeach; ?>
     <?php foreach ($projects as $index => $project) : ?>
-        <a href="<?php echo esc_url($project['permalink']); ?>" class="ss-still" data-pile-still="<?php echo (int) $index; ?>" style="text-decoration:none;color:inherit<?php echo $index < $count - 1 ? ';padding-bottom:18px' : ''; ?>">
+        <a href="<?php echo esc_url($project['permalink']); ?>" class="ss-still<?php echo $index < $count - 1 ? ' ss-still--spaced' : ''; ?>" data-pile-still="<?php echo (int) $index; ?>">
             <?php if (!empty($project['image']['src'])) : ?>
                 <img src="<?php echo esc_url($project['image']['src']); ?>" alt="<?php echo esc_attr($project['image']['alt']); ?>" loading="lazy" />
             <?php endif; ?>

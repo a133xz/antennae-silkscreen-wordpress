@@ -24,12 +24,13 @@
     return mb;
   };
 
+  let pileTop = PILE_TOP_DEFAULT;
+
   const measure = () => {
     const heights = stickies.map((el) => Math.round(el.getBoundingClientRect().height));
-    let pileTop = PILE_TOP_DEFAULT;
     if (window.scrollY === 0 && stickies[0]) {
-      const stickyWrap = stickies[0].parentElement;
-      if (stickyWrap) pileTop = Math.round(stickyWrap.getBoundingClientRect().top);
+      const nextTop = Math.round(stickies[0].getBoundingClientRect().top);
+      if (nextTop > 0) pileTop = Math.max(PILE_TOP_DEFAULT, nextTop);
     }
     titleCells.forEach((cell, index) => {
       cell.style.gridColumn = '1';
@@ -46,6 +47,7 @@
     });
   };
 
+  grid.style.gridTemplateRows = `repeat(${count}, auto)`;
   stickies.forEach((el) => {
     el.style.position = 'sticky';
   });

@@ -7,7 +7,7 @@ require get_template_directory() . '/template-parts/document-open.php';
     <div class="ss-shell__viewport">
     <?php require get_template_directory() . '/template-parts/site-header.php'; ?>
     <main class="ss-main ss-main--pad-header">
-        <div class="ss-page-content" style="padding-top:2.5rem;padding-bottom:200px">
+        <div class="ss-page-content ss-page-content--projects">
             <h1 class="sr-only">Projects</h1>
             <?php get_template_part('template-parts/projects-scroll', null, array('projects' => silkscreen_listed_projects())); ?>
         </div>
