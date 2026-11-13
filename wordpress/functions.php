@@ -122,6 +122,23 @@ add_action('wp_enqueue_scripts', function () {
         );
     }
 
+    if (is_singular(SILKSCREEN_PROJECT_POST_TYPE)) {
+        wp_enqueue_script(
+            'silkscreen-2026-project-band',
+            $uri . '/js/project-band.js',
+            array(),
+            filemtime($dir . '/js/project-band.js'),
+            true
+        );
+        wp_enqueue_script(
+            'silkscreen-2026-project-slideshow',
+            $uri . '/js/project-slideshow.js',
+            array(),
+            filemtime($dir . '/js/project-slideshow.js'),
+            true
+        );
+    }
+
     if (is_post_type_archive(SILKSCREEN_NEWS_POST_TYPE) || is_page_template('page-news.php')) {
         wp_enqueue_script(
             'silkscreen-2026-news-reveal',

@@ -6,41 +6,106 @@ if (!$post) {
 }
 $project = silkscreen_project_from_post($post);
 $ss_theme = $project['detail_theme'] === 'accent' ? 'light' : $project['detail_theme'];
-require get_template_directory() . '/template-parts/document-open.php';
-$stills = $project['stills'] ? $project['stills'] : ($project['image'] ? array($project['image']) : array());
+$sparse = silkscreen_project_is_sparse($project);
+$synopsis = silkscreen_project_detail_synopsis($project);
+$stills = silkscreen_project_detail_stills($project);
+$credits = silkscreen_project_detail_credits($project);
 $poster = $project['poster'] ?: $project['image'];
+$trailer = $project['trailer_url'];
+$tickets = $project['tickets_url'];
+$show_actions = $trailer !== '' || $tickets !== '' || $synopsis !== '' || $sparse;
+require get_template_directory() . '/template-parts/document-open.php';
 ?>
 <div class="ss-shell" data-theme="<?php echo esc_attr($ss_theme); ?>">
     <div class="ss-shell__viewport">
     <?php require get_template_directory() . '/template-parts/site-header.php'; ?>
     <main class="ss-main ss-main--pad-header">
         <article>
-            <div class="ss-page-content ss-project-detail-header">
-                <h1 class="font-display type-hero-fluid uppercase" style="margin:0;letter-spacing:-0.03em;line-height:1.07"><?php echo esc_html($project['title']); ?></h1>
-                <?php if ($project['synopsis']) : ?>
-                    <p class="font-serif type-heading-fluid" style="max-width:62rem;margin:26px auto 0;font-style:italic;font-weight:500;line-height:1.375"><?php echo esc_html($project['synopsis']); ?></p>
+            <div class="ss-page-content">
+                <header class="ss-project-detail-header">
+                    <h1 class="ss-project-title font-display uppercase"><?php echo esc_html($project['title']); ?></h1>
+                    <?php if ($synopsis !== '') : ?>
+                        <p class="ss-project-synopsis font-serif type-heading-fluid"><?php echo esc_html($synopsis); ?></p>
+                    <?php endif; ?>
+                </header>
+                <?php if ($show_actions) : ?>
+                    <div class="ss-project-actions">
+                        <span class="ss-project-actions__spacer" aria-hidden="true"></span>
+                        <div class="ss-project-actions__row">
+                            <?php
+                            $actions = array(
+                                array('href' => $trailer, 'label' => 'Watch trailer'),
+                                array('href' => $tickets, 'label' => 'Book tickets'),
+                            );
+                            $label_only = $trailer === '' && $tickets === '';
+                            foreach ($actions as $action) :
+                                if ($action['href'] === '' && !$label_only) {
+                                    continue;
+                                }
+                                $external = $action['href'] !== '' && preg_match('#^https?://#', $action['href']);
+                                if ($action['href'] === '') :
+                                    ?>
+                                    <span class="ss-project-action"><?php echo esc_html($action['label']); ?><span aria-hidden="true">&gt;</span></span>
+                                <?php else : ?>
+                                    <a class="ss-project-action" href="<?php echo esc_url($action['href']); ?>"<?php echo $external ? ' target="_blank" rel="noreferrer"' : ''; ?>><?php echo esc_html($action['label']); ?><span aria-hidden="true">&gt;</span></a>
+                                <?php endif;
+                            endforeach;
+                            ?>
+                        </div>
+                    </div>
                 <?php endif; ?>
             </div>
-            <?php foreach ($stills as $still) : ?>
-                <div class="ss-page-content" style="margin-top:2rem">
-                    <img src="<?php echo esc_url($still['src']); ?>" alt="<?php echo esc_attr($still['alt']); ?>" style="width:100%;height:auto;display:block" />
-                </div>
-            <?php endforeach; ?>
-            <?php if ($poster || $project['credits']) : ?>
-                <div class="ss-page-content" style="margin:3rem auto;max-width:1200px;display:grid;gap:3rem">
-                    <?php if ($poster) : ?>
-                        <img src="<?php echo esc_url($poster['src']); ?>" alt="<?php echo esc_attr($poster['alt']); ?>" style="max-width:455px;width:100%;height:auto;display:block;margin:0 auto" />
-                    <?php endif; ?>
-                    <?php if ($project['credits']) : ?>
-                        <div class="font-mono text-micro" style="text-transform:uppercase;text-align:center">
-                            <?php foreach ($project['credits'] as $credit) : ?>
-                                <p style="margin:0 0 1rem">
-                                    <strong><?php echo esc_html($credit['custom_label'] ?: str_replace('-', ' ', $credit['role'])); ?></strong><br />
-                                    <?php echo esc_html(implode(', ', $credit['names'])); ?>
-                                </p>
+            <?php if ($stills) : ?>
+                <div class="ss-project-band" data-project-band-root>
+                    <div class="ss-page-content">
+                        <div class="ss-project-frame" data-project-slideshow>
+                            <?php foreach ($stills as $index => $still) : ?>
+                                <img
+                                    src="<?php echo esc_url($still['src']); ?>"
+                                    alt="<?php echo $index === 0 ? esc_attr($still['alt']) : ''; ?>"
+                                    data-still="<?php echo (int) $index; ?>"
+                                    data-alt="<?php echo esc_attr($still['alt']); ?>"
+                                    <?php echo $index === 0 ? 'class="is-active"' : ''; ?>
+                                />
                             <?php endforeach; ?>
                         </div>
-                    <?php endif; ?>
+                        <div class="ss-project-dots" role="tablist" aria-label="Stills">
+                            <?php foreach ($stills as $index => $still) : ?>
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    data-still-tab="<?php echo (int) $index; ?>"
+                                    aria-selected="<?php echo $index === 0 ? 'true' : 'false'; ?>"
+                                    aria-label="<?php echo esc_attr('Still ' . ($index + 1)); ?>"
+                                ><?php echo (int) ($index + 1); ?></button>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php if ($poster || $credits) : ?>
+                            <div class="ss-project-detail-grid">
+                                <?php if ($poster) : ?>
+                                    <div class="ss-project-poster">
+                                        <img src="<?php echo esc_url($poster['src']); ?>" alt="<?php echo esc_attr($poster['alt']); ?>" />
+                                    </div>
+                                <?php else : ?>
+                                    <span class="ss-project-actions__spacer" aria-hidden="true"></span>
+                                <?php endif; ?>
+                                <?php if ($credits) : ?>
+                                    <dl class="ss-project-credits">
+                                        <?php foreach ($credits as $credit) : ?>
+                                            <div class="ss-project-credit">
+                                                <dt><?php echo esc_html(silkscreen_credit_label($credit)); ?></dt>
+                                                <dd>
+                                                    <?php foreach ($credit['names'] as $name) : ?>
+                                                        <span><?php echo esc_html($name); ?></span>
+                                                    <?php endforeach; ?>
+                                                </dd>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </dl>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endif; ?>
         </article>

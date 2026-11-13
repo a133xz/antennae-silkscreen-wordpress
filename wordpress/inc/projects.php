@@ -126,3 +126,106 @@ function silkscreen_poster_projects() {
         return !empty($p['on_posters']);
     }));
 }
+
+function silkscreen_project_is_sparse($project) {
+    $still_count = !empty($project['stills']) ? count($project['stills']) : 0;
+    $no_copy = $project['synopsis'] === '' && empty($project['poster']) && empty($project['credits']);
+    return $still_count < 2 || $no_copy;
+}
+
+function silkscreen_project_neighbors($project) {
+    if (!empty($project['listed'])) {
+        $list = silkscreen_listed_projects();
+    } elseif (!empty($project['on_posters'])) {
+        $list = silkscreen_poster_projects();
+    } else {
+        $list = silkscreen_listed_projects();
+    }
+    $index = -1;
+    foreach ($list as $i => $item) {
+        if ($item['slug'] === $project['slug']) {
+            $index = $i;
+            break;
+        }
+    }
+    return array(
+        'prev' => $index > 0 ? $list[$index - 1] : null,
+        'next' => ($index >= 0 && $index < count($list) - 1) ? $list[$index + 1] : null,
+    );
+}
+
+function silkscreen_project_primary_still($project) {
+    if (!empty($project['stills'])) {
+        return $project['stills'][0];
+    }
+    if (!empty($project['image'])) {
+        return $project['image'];
+    }
+    return null;
+}
+
+function silkscreen_project_detail_stills($project) {
+    $own = !empty($project['stills']) ? $project['stills'] : (!empty($project['image']) ? array($project['image']) : array());
+    if (!silkscreen_project_is_sparse($project)) {
+        return $own;
+    }
+    $neighbors = silkscreen_project_neighbors($project);
+    $seen = array();
+    foreach ($own as $still) {
+        $seen[$still['src']] = true;
+    }
+    foreach (array('prev', 'next') as $key) {
+        if (empty($neighbors[$key])) {
+            continue;
+        }
+        $still = silkscreen_project_primary_still($neighbors[$key]);
+        if (!$still || isset($seen[$still['src']])) {
+            continue;
+        }
+        $own[] = $still;
+        $seen[$still['src']] = true;
+    }
+    return $own;
+}
+
+function silkscreen_project_detail_credits($project) {
+    if (!empty($project['credits'])) {
+        return $project['credits'];
+    }
+    if (!empty($project['director'])) {
+        return array(array(
+            'role' => 'directed',
+            'custom_label' => '',
+            'names' => array($project['director']),
+        ));
+    }
+    return array();
+}
+
+function silkscreen_project_detail_synopsis($project) {
+    if ($project['synopsis'] !== '') {
+        return $project['synopsis'];
+    }
+    if (silkscreen_project_is_sparse($project)) {
+        return 'More on this title is coming soon.';
+    }
+    return '';
+}
+
+function silkscreen_credit_label($credit) {
+    $labels = array(
+        'directed' => 'Directed by',
+        'written' => 'Written by',
+        'produced' => 'Produced by',
+        'executive-producers' => 'Executive Producers',
+        'companies' => 'Production Companies',
+        'starring' => 'Starring',
+        'custom' => 'Credit',
+    );
+    if (($credit['role'] ?? '') === 'custom') {
+        $custom = isset($credit['custom_label']) ? trim($credit['custom_label']) : '';
+        return $custom !== '' ? $custom : $labels['custom'];
+    }
+    $role = $credit['role'] ?? 'custom';
+    return isset($labels[$role]) ? $labels[$role] : $labels['custom'];
+}
