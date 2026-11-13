@@ -148,8 +148,8 @@ if ($force) {
 
 silkscreen_seed_log('Creating pages…');
 $home_id = silkscreen_seed_page('Home', 'home');
-silkscreen_seed_page('About', 'about', 'page-about.php');
-silkscreen_seed_page('Contact', 'contact', 'page-contact.php');
+$about_id = silkscreen_seed_page('About', 'about', 'page-about.php');
+$contact_id = silkscreen_seed_page('Contact', 'contact', 'page-contact.php');
 silkscreen_seed_page('Posters', 'posters', 'page-posters.php');
 $shop_id = silkscreen_seed_page('Shop settings', 'shop-settings', 'page-shop-settings.php');
 
@@ -159,6 +159,14 @@ update_option('page_on_front', $home_id);
 $s = $data['settings'];
 update_field('tagline', $s['tagline'], $home_id);
 update_field('statement', $s['statement'], $home_id);
+update_field('about_statement', $s['statement'], $about_id);
+update_field('contact_intro', $s['contact_intro'], $contact_id);
+foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
+    $row = $s['emails'][$slot - 1] ?? array('label' => '', 'address' => '');
+    update_field('contact_email_' . $slot . '_label', $row['label'], $contact_id);
+    update_field('contact_email_' . $slot . '_address', $row['address'], $contact_id);
+}
+update_field('contact_emails_extra', array(), $contact_id);
 update_field('copyright', $s['copyright'], $home_id);
 update_field('social_handle', $s['social_handle'], $home_id);
 update_field('social_url', $s['social_url'], $home_id);

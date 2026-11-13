@@ -14,6 +14,8 @@ Classic PHP theme (same ops model as `antennae-gabos-wordpress`), aligned with t
 | **Projects** (`silkscreen_project`) | Films / poster titles — replace Gabos “posts”. Full ACF panel for director, stills, credits, featured, posters, etc. |
 | **News** (`silkscreen_news`) | Masony items with **three layout types**: caption below, caption overlay, compact — plus masonry size (narrow → half-short). |
 | **Front page** ACF | Site settings, hero gallery, contact emails, shop/posters toggles |
+| **About** page (`page-about.php`) | About statement (defaults to approved copy; falls back to Home site settings) |
+| **Contact** page (`page-contact.php`) | Intro + 3 primary emails (label + address each) + optional extra emails |
 | **Shop settings** page (`page-shop-settings.php`) | Up to 6 products (mirrors `records.ts`) |
 
 Routes: `/projects/`, `/projects/{slug}/`, `/news/`, `/shop/`, `/shop/{slug}/`, plus page templates Contact, About, Posters.

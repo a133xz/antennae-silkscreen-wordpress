@@ -214,6 +214,80 @@ function silkscreen_news_fields() {
     );
 }
 
+function silkscreen_contact_email_sub_fields($key_prefix) {
+    return array(
+        array('key' => 'field_ss_' . $key_prefix . '_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
+        array('key' => 'field_ss_' . $key_prefix . '_address', 'label' => 'Email', 'name' => 'address', 'type' => 'email'),
+    );
+}
+
+function silkscreen_contact_primary_slot_fields() {
+    $fields = array();
+    $defaults = silkscreen_default_contact_emails();
+
+    foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
+        $row = isset($defaults[$slot - 1]) ? $defaults[$slot - 1] : array('label' => '', 'address' => '');
+        $fields[] = array(
+            'key' => 'field_ss_contact_email_' . $slot . '_label',
+            'label' => sprintf('Email %d — type label', $slot),
+            'name' => 'contact_email_' . $slot . '_label',
+            'type' => 'text',
+            'default_value' => $row['label'],
+            'wrapper' => array('width' => '50'),
+        );
+        $fields[] = array(
+            'key' => 'field_ss_contact_email_' . $slot . '_address',
+            'label' => sprintf('Email %d — address', $slot),
+            'name' => 'contact_email_' . $slot . '_address',
+            'type' => 'email',
+            'default_value' => $row['address'],
+            'wrapper' => array('width' => '50'),
+        );
+    }
+
+    return $fields;
+}
+
+function silkscreen_contact_fields() {
+    return array_merge(
+        array(
+            array(
+                'key' => 'field_ss_contact_page_intro',
+                'label' => 'Contact intro',
+                'name' => 'contact_intro',
+                'type' => 'textarea',
+                'rows' => 3,
+                'default_value' => SILKSCREEN_CONTACT_INTRO,
+            ),
+        ),
+        silkscreen_contact_primary_slot_fields(),
+        array(
+            array(
+                'key' => 'field_ss_contact_emails_extra',
+                'label' => 'Additional emails',
+                'name' => 'contact_emails_extra',
+                'type' => 'repeater',
+                'layout' => 'table',
+                'button_label' => 'Add email',
+                'sub_fields' => silkscreen_contact_email_sub_fields('contact_extra_email'),
+            ),
+        )
+    );
+}
+
+function silkscreen_about_fields() {
+    return array(
+        array(
+            'key' => 'field_ss_about_statement',
+            'label' => 'About statement',
+            'name' => 'about_statement',
+            'type' => 'textarea',
+            'rows' => 5,
+            'default_value' => SILKSCREEN_STATEMENT,
+        ),
+    );
+}
+
 function silkscreen_home_fields() {
     return array(
         array('key' => 'field_ss_tagline', 'label' => 'Tagline', 'name' => 'tagline', 'type' => 'text', 'default_value' => SILKSCREEN_TAGLINE),
@@ -253,10 +327,7 @@ function silkscreen_home_fields() {
             'type' => 'repeater',
             'layout' => 'table',
             'button_label' => 'Add email',
-            'sub_fields' => array(
-                array('key' => 'field_ss_email_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-                array('key' => 'field_ss_email_address', 'label' => 'Email', 'name' => 'address', 'type' => 'email'),
-            ),
+            'sub_fields' => silkscreen_contact_email_sub_fields('email'),
         ),
     );
 }
@@ -327,4 +398,63 @@ add_action('acf/init', function () {
         'location' => array(array(array('param' => 'page_template', 'operator' => '==', 'value' => SILKSCREEN_SHOP_PAGE_TEMPLATE))),
         'active' => true,
     ));
+
+    acf_add_local_field_group(array(
+        'key' => 'group_silkscreen_2026_about',
+        'title' => 'About page',
+        'fields' => silkscreen_about_fields(),
+        'location' => array(array(array('param' => 'page_template', 'operator' => '==', 'value' => 'page-about.php'))),
+        'position' => 'acf_after_title',
+        'active' => true,
+    ));
+
+    acf_add_local_field_group(array(
+        'key' => 'group_silkscreen_2026_contact',
+        'title' => 'Contact page',
+        'fields' => silkscreen_contact_fields(),
+        'location' => array(array(array('param' => 'page_template', 'operator' => '==', 'value' => 'page-contact.php'))),
+        'position' => 'acf_after_title',
+        'active' => true,
+    ));
 });
+
+add_filter('acf/load_value/name=contact_intro', function ($value, $post_id, $field) {
+    if ($value !== null && $value !== '') {
+        return $value;
+    }
+    if (get_post_meta($post_id, '_wp_page_template', true) !== 'page-contact.php') {
+        return $value;
+    }
+    return SILKSCREEN_CONTACT_INTRO;
+}, 10, 3);
+
+add_filter('acf/load_value', function ($value, $post_id, $field) {
+    if (!is_array($field) || empty($field['name'])) {
+        return $value;
+    }
+    if (get_post_meta($post_id, '_wp_page_template', true) !== 'page-contact.php') {
+        return $value;
+    }
+    if ($value !== null && $value !== '') {
+        return $value;
+    }
+    if (!preg_match('/^contact_email_([1-3])_(label|address)$/', $field['name'], $matches)) {
+        return $value;
+    }
+    $defaults = silkscreen_default_contact_emails();
+    $slot = (int) $matches[1] - 1;
+    if (!isset($defaults[$slot])) {
+        return $value;
+    }
+    return $matches[2] === 'label' ? $defaults[$slot]['label'] : $defaults[$slot]['address'];
+}, 10, 3);
+
+add_filter('acf/load_value/name=about_statement', function ($value, $post_id, $field) {
+    if ($value !== null && $value !== '') {
+        return $value;
+    }
+    if (get_post_meta($post_id, '_wp_page_template', true) !== 'page-about.php') {
+        return $value;
+    }
+    return SILKSCREEN_STATEMENT;
+}, 10, 3);

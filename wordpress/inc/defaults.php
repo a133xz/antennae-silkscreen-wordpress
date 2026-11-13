@@ -7,5 +7,15 @@ const SILKSCREEN_SOCIAL_HANDLE = '@silkscreen_ent';
 const SILKSCREEN_SOCIAL_URL = 'https://instagram.com/silkscreen_ent';
 const SILKSCREEN_CONTACT_INTRO = 'If you would like to get in touch, you can reach us at the addresses below.';
 
+const SILKSCREEN_CONTACT_PRIMARY_SLOTS = 3;
+
+function silkscreen_default_contact_emails() {
+    return array(
+        array('label' => 'General Inquiries', 'address' => 'hello@silkscreen.com'),
+        array('label' => 'Press', 'address' => 'press@silkscreen.com'),
+        array('label' => 'Collaborations', 'address' => 'collaborations@silkscreen.com'),
+    );
+}
+
 const SILKSCREEN_PROJECT_POST_TYPE = 'silkscreen_project';
 const SILKSCREEN_NEWS_POST_TYPE = 'silkscreen_news';
