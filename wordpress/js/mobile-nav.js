@@ -1,8 +1,13 @@
 (function () {
   const openBtn = document.querySelector('[data-mobile-nav-open]');
-  const panel = document.querySelector('[data-mobile-nav-panel]');
-  const closeBtn = document.querySelector('[data-mobile-nav-close]');
+  let panel = document.querySelector('[data-mobile-nav-panel]');
   if (!openBtn || !panel) return;
+
+  if (panel.parentElement !== document.body) {
+    document.body.appendChild(panel);
+  }
+
+  const closeBtn = panel.querySelector('[data-mobile-nav-close]');
 
   const setOpen = (open) => {
     openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');

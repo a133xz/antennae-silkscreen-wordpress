@@ -17,36 +17,63 @@ $secondary = array(
 $nav_items = array_merge($primary, $secondary);
 $header_class = isset($ss_header_class) ? $ss_header_class : '';
 $static_mobile = !empty($ss_static_mobile_header);
-$on_hero = !empty($ss_header_on_hero);
+$after_hero = !empty($ss_header_after_hero);
+$fix_mobile = !$static_mobile && !$after_hero;
+$transparent = !empty($ss_header_transparent_mobile);
 $menu_light = !empty($ss_mobile_menu_light);
+$logo_blend = !empty($ss_logo_blend);
 ?>
 <header
     data-site-header
     <?php echo $static_mobile ? ' data-static-mobile-header' : ''; ?>
-    class="<?php echo esc_attr(trim($header_class . ($on_hero ? ' ss-header--on-hero' : ''))); ?>"
+    <?php echo $fix_mobile ? ' data-fix-mobile-header' : ''; ?>
+    class="<?php echo esc_attr(trim($header_class . ($after_hero ? ' ss-header--after-hero' : ''))); ?>"
 >
-    <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo relative z-10 <?php echo !empty($ss_logo_blend) ? 'ss-logo--blend' : ''; ?>">
+    <?php if ($fix_mobile && !$transparent) : ?>
+        <div class="ss-header-fill-wrap" aria-hidden="true">
+            <div data-header-fill class="ss-header-fill"></div>
+        </div>
+    <?php endif; ?>
+    <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo relative z-10 <?php echo $logo_blend ? 'ss-logo--blend' : ''; ?>">
         <img src="<?php echo esc_url(silkscreen_asset('brand/wordmark.svg')); ?>" alt="Silkscreen" width="160" height="32" />
     </a>
     <nav data-site-nav class="relative z-10" aria-label="Primary">
-        <div>
+        <ul class="ss-site-nav-group">
             <?php foreach ($primary as $item) : ?>
-                <a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['label']); ?></a>
+                <li><a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['label']); ?></a></li>
             <?php endforeach; ?>
-        </div>
-        <div>
+        </ul>
+        <ul class="ss-site-nav-group">
             <?php foreach ($secondary as $item) : ?>
-                <a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['label']); ?></a>
+                <li><a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['label']); ?></a></li>
             <?php endforeach; ?>
-        </div>
+        </ul>
     </nav>
-    <button type="button" class="ss-mobile-nav-toggle relative z-10" data-mobile-nav-open aria-expanded="false" aria-controls="ss-mobile-nav">Menu</button>
+    <div class="ss-mobile-nav-bar relative z-10">
+        <button type="button" class="ss-mobile-nav-toggle" data-mobile-nav-open aria-expanded="false" aria-controls="ss-mobile-nav" aria-haspopup="dialog">Menu</button>
+    </div>
 </header>
-<div id="ss-mobile-nav" data-mobile-nav-panel<?php echo $menu_light ? ' data-menu-light' : ''; ?> aria-hidden="true">
-    <button type="button" class="ss-mobile-nav-toggle" data-mobile-nav-close style="align-self:flex-end">Close</button>
-    <nav aria-label="Mobile">
-        <?php foreach ($nav_items as $item) : ?>
-            <a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['label']); ?></a>
-        <?php endforeach; ?>
+<div
+    id="ss-mobile-nav"
+    data-mobile-nav-panel
+    <?php echo $menu_light ? ' data-menu-light' : ''; ?>
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu"
+    aria-hidden="true"
+    data-visible="false"
+>
+    <div class="ss-mobile-nav-panel__top">
+        <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo">
+            <img src="<?php echo esc_url(silkscreen_asset('brand/wordmark.svg')); ?>" alt="Silkscreen" width="160" height="32" />
+        </a>
+        <button type="button" class="ss-mobile-nav-toggle" data-mobile-nav-close>Close</button>
+    </div>
+    <nav class="ss-mobile-nav-panel__links" aria-label="Mobile">
+        <ul data-site-nav>
+            <?php foreach ($nav_items as $item) : ?>
+                <li><a href="<?php echo esc_url($item['href']); ?>"><?php echo esc_html($item['label']); ?></a></li>
+            <?php endforeach; ?>
+        </ul>
     </nav>
 </div>

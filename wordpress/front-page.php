@@ -6,25 +6,26 @@ $news = silkscreen_featured_news(3);
 $products = ($settings['shop_enabled'] && silkscreen_shop_available()) ? silkscreen_featured_products(3) : array();
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
-<div class="ss-shell" data-theme="light">
+<div class="ss-shell ss-shell--home" data-theme="light">
     <?php require get_template_directory() . '/template-parts/hero.php'; ?>
     <?php
-    $ss_header_on_hero = true;
+    $ss_header_after_hero = true;
     require get_template_directory() . '/template-parts/site-header.php';
     ?>
-    <main class="ss-main">
-        <div class="ss-page-content" style="padding-top:3rem">
-            <section style="padding-top:4rem">
+    <main class="ss-main ss-main--home">
+        <div class="ss-page-content">
+            <section class="ss-home-section ss-home-section--first">
                 <?php
                 $label = 'Featured projects';
                 $href = home_url('/projects/');
                 $action = 'View all projects';
                 $action_below_md = true;
+                $layout_split_two = true;
                 require get_template_directory() . '/template-parts/section-header.php';
                 ?>
-                <ul class="ss-grid-930" style="list-style:none;margin:0;padding:0">
+                <ul class="ss-grid-930 ss-grid-930--home">
                     <?php foreach ($projects as $project) : ?>
-                        <li><?php get_template_part('template-parts/project-card', null, array('project' => $project, 'title_tag' => 'h3')); ?></li>
+                        <li><?php get_template_part('template-parts/project-card', null, array('project' => $project, 'title_tag' => 'h3', 'home_featured' => true)); ?></li>
                     <?php endforeach; ?>
                 </ul>
                 <div class="ss-section-action-below">
@@ -32,12 +33,13 @@ require get_template_directory() . '/template-parts/document-open.php';
                 </div>
             </section>
 
-            <section style="margin-top:5rem">
+            <section class="ss-home-section ss-home-section--news">
                 <?php
                 $label = 'Latest news';
                 $href = home_url('/news/');
                 $action = 'View all news';
                 $action_below_md = true;
+                $layout_split_two = true;
                 require get_template_directory() . '/template-parts/section-header.php';
                 get_template_part('template-parts/news-masonry', null, array('items' => $news, 'title_tag' => 'h3'));
                 ?>
@@ -48,28 +50,9 @@ require get_template_directory() . '/template-parts/document-open.php';
         </div>
 
         <?php if ($products) : ?>
-            <section class="ss-page-content" style="margin-top:5rem;margin-bottom:6rem">
-                <?php
-                $label = 'Shop';
-                $href = silkscreen_shop_url();
-                $action = 'View shop';
-                $action_below_md = false;
-                require get_template_directory() . '/template-parts/section-header.php';
-                ?>
-                <ul class="ss-shop-grid" style="list-style:none;margin:0;padding:0">
-                    <?php foreach ($products as $product) : ?>
-                        <li>
-                            <a href="<?php echo esc_url(silkscreen_shop_url($product['slug'])); ?>" style="color:inherit;text-decoration:none">
-                                <img src="<?php echo esc_url($product['image']['src']); ?>" alt="<?php echo esc_attr($product['image']['alt']); ?>" style="width:100%;height:auto;display:block" />
-                                <p class="font-display type-heading-fluid uppercase" style="margin:.75rem 0 .25rem"><?php echo esc_html($product['title']); ?></p>
-                                <p class="ss-product-card__price"><?php echo esc_html(silkscreen_format_price($product['price'])); ?></p>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </section>
+            <?php get_template_part('template-parts/home-shop-section', null, array('products' => $products)); ?>
         <?php else : ?>
-            <div style="margin-bottom:6rem" aria-hidden="true"></div>
+            <div class="ss-home-shop-spacer" aria-hidden="true"></div>
         <?php endif; ?>
     </main>
     <?php require get_template_directory() . '/template-parts/site-footer.php'; ?>

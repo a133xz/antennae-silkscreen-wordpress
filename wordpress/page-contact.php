@@ -12,8 +12,8 @@ require get_template_directory() . '/template-parts/document-open.php';
     $ss_static_mobile_header = true;
     require get_template_directory() . '/template-parts/site-header.php';
     ?>
-    <main class="ss-main" style="display:flex;flex:1;align-items:center">
-        <div class="ss-page-content" style="width:100%;padding:4rem 0">
+    <main class="ss-main ss-main--contact">
+        <div class="ss-page-content ss-page-content--contact">
             <h1 class="ss-contact-lede font-display"><?php echo esc_html($contact_intro); ?></h1>
             <ul class="ss-email-list">
                 <?php foreach ($contact_emails as $row) : ?>

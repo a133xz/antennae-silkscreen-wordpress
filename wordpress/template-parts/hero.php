@@ -13,5 +13,13 @@ $slides = $settings['hero'];
             height="1080"
         />
     <?php endforeach; ?>
-    <img class="ss-hero__wordmark" src="<?php echo esc_url(silkscreen_asset('brand/wordmark.svg')); ?>" alt="" width="1245" height="170" />
+    <img
+        class="ss-hero__wordmark"
+        src="<?php echo esc_url(silkscreen_asset('brand/wordmark.svg')); ?>"
+        alt=""
+        width="1245"
+        height="170"
+        decoding="async"
+        fetchpriority="high"
+    />
 </section>
