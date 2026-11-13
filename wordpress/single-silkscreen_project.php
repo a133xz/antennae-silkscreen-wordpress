@@ -11,6 +11,7 @@ $stills = $project['stills'] ? $project['stills'] : ($project['image'] ? array($
 $poster = $project['poster'] ?: $project['image'];
 ?>
 <div class="ss-shell" data-theme="<?php echo esc_attr($ss_theme); ?>">
+    <div class="ss-shell__viewport">
     <?php require get_template_directory() . '/template-parts/site-header.php'; ?>
     <main class="ss-main ss-main--pad-header">
         <article>
@@ -44,6 +45,7 @@ $poster = $project['poster'] ?: $project['image'];
             <?php endif; ?>
         </article>
     </main>
+    </div>
     <?php require get_template_directory() . '/template-parts/site-footer.php'; ?>
 </div>
 <?php require get_template_directory() . '/template-parts/document-close.php';

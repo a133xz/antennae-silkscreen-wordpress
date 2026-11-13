@@ -34,8 +34,8 @@ $logo_blend = !empty($ss_logo_blend);
             <div data-header-fill class="ss-header-fill"></div>
         </div>
     <?php endif; ?>
-    <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo relative z-10 <?php echo $logo_blend ? 'ss-logo--blend' : ''; ?>">
-        <img src="<?php echo esc_url(silkscreen_asset('brand/wordmark.svg')); ?>" alt="Silkscreen" width="160" height="32" />
+    <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo relative z-10 <?php echo $logo_blend ? 'ss-logo--blend' : ''; ?>" aria-label="Silkscreen">
+        <?php get_template_part('template-parts/logo', null, array('blend' => $logo_blend)); ?>
     </a>
     <nav data-site-nav class="relative z-10" aria-label="Primary">
         <ul class="ss-site-nav-group">
@@ -64,8 +64,8 @@ $logo_blend = !empty($ss_logo_blend);
     data-visible="false"
 >
     <div class="ss-mobile-nav-panel__top">
-        <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo">
-            <img src="<?php echo esc_url(silkscreen_asset('brand/wordmark.svg')); ?>" alt="Silkscreen" width="160" height="32" />
+        <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo" aria-label="Silkscreen">
+            <?php get_template_part('template-parts/logo', null, array('blend' => $logo_blend)); ?>
         </a>
         <button type="button" class="ss-mobile-nav-toggle" data-mobile-nav-close>Close</button>
     </div>

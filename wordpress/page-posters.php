@@ -15,6 +15,7 @@ $ss_theme = 'inverse';
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
 <div class="ss-shell ss-shell--fill" data-theme="inverse">
+    <div class="ss-shell__viewport">
     <?php
     $ss_static_mobile_header = true;
     $ss_mobile_menu_light = true;
@@ -39,6 +40,7 @@ require get_template_directory() . '/template-parts/document-open.php';
             <?php endforeach; ?>
         </ul>
     </main>
+    </div>
     <?php require get_template_directory() . '/template-parts/site-footer.php'; ?>
 </div>
 <?php require get_template_directory() . '/template-parts/document-close.php';

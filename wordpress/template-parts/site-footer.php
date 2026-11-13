@@ -1,4 +1,7 @@
-<?php $settings = silkscreen_settings(); ?>
+<?php
+$settings = silkscreen_settings();
+$bug_src = esc_url(silkscreen_asset('brand/bug.svg'));
+?>
 <footer class="ss-footer">
     <div class="ss-footer__inner">
         <div class="ss-footer__meta font-display">
@@ -7,6 +10,10 @@
             </a>
             <p><?php echo esc_html($settings['copyright']); ?></p>
         </div>
-        <img class="ss-footer__bug" src="<?php echo esc_url(silkscreen_asset('brand/bug.svg')); ?>" alt="" width="120" height="56" />
+        <span
+            class="ss-mark ss-footer__bug"
+            aria-hidden="true"
+            style="mask-image: url(<?php echo $bug_src; ?>); -webkit-mask-image: url(<?php echo $bug_src; ?>);"
+        ></span>
     </div>
 </footer>

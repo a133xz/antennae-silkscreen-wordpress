@@ -7,6 +7,7 @@ $products = ($settings['shop_enabled'] && silkscreen_shop_available()) ? silkscr
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
 <div class="ss-shell ss-shell--home" data-theme="light">
+    <div class="ss-shell__viewport">
     <?php require get_template_directory() . '/template-parts/hero.php'; ?>
     <?php
     $ss_header_after_hero = true;
@@ -29,7 +30,7 @@ require get_template_directory() . '/template-parts/document-open.php';
                     <?php endforeach; ?>
                 </ul>
                 <div class="ss-section-action-below">
-                    <a class="ss-text-link" href="<?php echo esc_url(home_url('/projects/')); ?>">View all projects</a>
+                    <?php get_template_part('template-parts/text-link', null, array('href' => home_url('/projects/'), 'label' => 'View all projects')); ?>
                 </div>
             </section>
 
@@ -44,7 +45,7 @@ require get_template_directory() . '/template-parts/document-open.php';
                 get_template_part('template-parts/news-masonry', null, array('items' => $news, 'title_tag' => 'h3'));
                 ?>
                 <div class="ss-section-action-below">
-                    <a class="ss-text-link" href="<?php echo esc_url(home_url('/news/')); ?>">View all news</a>
+                    <?php get_template_part('template-parts/text-link', null, array('href' => home_url('/news/'), 'label' => 'View all news')); ?>
                 </div>
             </section>
         </div>
@@ -55,6 +56,7 @@ require get_template_directory() . '/template-parts/document-open.php';
             <div class="ss-home-shop-spacer" aria-hidden="true"></div>
         <?php endif; ?>
     </main>
+    </div>
     <?php require get_template_directory() . '/template-parts/site-footer.php'; ?>
 </div>
 <?php require get_template_directory() . '/template-parts/document-close.php';

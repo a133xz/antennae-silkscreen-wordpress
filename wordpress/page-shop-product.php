@@ -12,6 +12,7 @@ $ss_theme = 'light';
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
 <div class="ss-shell" data-theme="light">
+    <div class="ss-shell__viewport">
     <?php require get_template_directory() . '/template-parts/site-header.php'; ?>
     <main class="ss-main ss-main--pad-header">
         <div class="ss-page-content" style="padding:2.5rem 0 4rem;max-width:960px">
@@ -20,6 +21,7 @@ require get_template_directory() . '/template-parts/document-open.php';
             <img src="<?php echo esc_url($product['image']['src']); ?>" alt="<?php echo esc_attr($product['image']['alt']); ?>" style="width:100%;max-width:480px;height:auto;display:block" />
         </div>
     </main>
+    </div>
     <?php require get_template_directory() . '/template-parts/site-footer.php'; ?>
 </div>
 <?php require get_template_directory() . '/template-parts/document-close.php';

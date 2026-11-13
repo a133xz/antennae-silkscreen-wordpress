@@ -41,7 +41,7 @@ $bg = silkscreen_asset('media/home-shop.png');
             </ul>
         </div>
         <div class="ss-section-action-below">
-            <a class="ss-text-link" href="<?php echo esc_url($shop_url); ?>">View all products</a>
+            <?php get_template_part('template-parts/text-link', null, array('href' => $shop_url, 'label' => 'View all products')); ?>
         </div>
     </div>
 </div>
