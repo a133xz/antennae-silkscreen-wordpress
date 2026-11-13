@@ -10,4 +10,14 @@ npm run deploy        # changed files in wordpress/
 npm run verify        # FTP connection check
 ```
 
+### Local preview content
+
+With **Local** site running, ACF active, and **Silkscreen 2026** theme on:
+
+```bash
+npm run seed:local
+```
+
+Imports demo posts/pages from `antennae-silkscreen` (`seed/records.php`) into the WordPress database. See [seed/README.md](seed/README.md).
+
 Theme details: [wordpress/README.md](wordpress/README.md).
