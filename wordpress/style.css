@@ -51,16 +51,19 @@ Text Domain: silkscreen-2026
 [data-theme='light'] {
   --paper: #fff;
   --ink: #000;
+  --canvas: #fff;
 }
 
 [data-theme='inverse'] {
   --paper: #000;
   --ink: #fff;
+  --canvas: #000;
 }
 
 [data-theme='accent'] {
   --paper: #f2a9d3;
   --ink: #cd362f;
+  --canvas: #f2a9d3;
 }
 
 *, *::before, *::after {
@@ -78,6 +81,8 @@ body {
 
 body.silkscreen-theme {
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body.silkscreen-theme a,
@@ -243,6 +248,8 @@ body.silkscreen-theme a:visited {
 
 @media (min-width: 1300px) {
   [data-site-header] > [data-site-nav] {
+    position: relative;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -275,6 +282,8 @@ body.silkscreen-theme a:visited {
 }
 
 .ss-logo {
+  position: relative;
+  z-index: 10;
   display: inline-flex;
   width: fit-content;
   flex-shrink: 0;
@@ -304,8 +313,13 @@ body.silkscreen-theme a:visited {
 }
 
 .ss-mobile-nav-toggle {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
   font-family: var(--font-display);
   font-size: var(--text-nav-mobile);
+  font-weight: 400;
+  line-height: 1;
   text-transform: uppercase;
   background: none;
   border: 0;
@@ -341,6 +355,8 @@ body.silkscreen-theme a:visited {
 }
 
 .ss-mobile-nav-bar {
+  position: relative;
+  z-index: 10;
   display: block;
 }
 
@@ -380,6 +396,15 @@ body.silkscreen-theme a:visited {
   justify-content: space-between;
   gap: 1.5rem;
   padding: 1rem var(--gutter);
+}
+
+.ss-mobile-nav-panel__top--notch {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+  padding-bottom: 1rem;
+}
+
+[data-mobile-nav-panel][data-menu-light]:has(.ss-mobile-nav-panel__top--notch) {
+  padding-top: 0;
 }
 
 .ss-mobile-nav-panel__links {
@@ -536,7 +561,7 @@ html[data-about-active] [data-header-fill] {
 .ss-footer__meta a:hover { opacity: 0.6; }
 
 .ss-footer__bug {
-  aspect-ratio: 461 / 217.381;
+  aspect-ratio: 461 / 217;
   width: min(36vw, 8.5rem);
   height: auto;
   flex: 0 0 auto;
@@ -1069,6 +1094,7 @@ html[data-about-active] [data-header-fill] {
   text-align: center;
   font-family: var(--font-display);
   font-size: var(--text-title-sm);
+  font-weight: 400;
   text-transform: uppercase;
   line-height: 1;
   color: inherit;
@@ -1089,9 +1115,16 @@ html[data-about-active] [data-header-fill] {
 
 /* Posters */
 .ss-main--posters {
+  min-height: 0;
+}
+
+.ss-posters-stage {
   display: flex;
-  flex: 1;
+  flex: 1 1 auto;
   align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 .ss-shell--fill {
@@ -1104,11 +1137,13 @@ html[data-about-active] [data-header-fill] {
 
 .ss-posters-strip {
   display: flex;
+  flex: 1 1 auto;
   align-items: flex-start;
   gap: clamp(2rem, 7.86vw, 9.4375rem);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   width: 100%;
+  min-width: 0;
   list-style: none;
   margin: 0;
   padding: 2rem clamp(1.25rem, 1.41vw, 1.6875rem);
@@ -1281,9 +1316,18 @@ html[data-about-active] .ss-about-content {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: center;
   align-items: stretch;
   width: 100%;
+  min-height: 0;
+}
+
+.ss-about-stage {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 .ss-main--contact {
@@ -1295,9 +1339,15 @@ html[data-about-active] .ss-about-content {
 }
 
 @media (max-width: 767px) {
-  .ss-main--about {
-    min-height: calc(100svh + 8rem);
-    justify-content: flex-start;
+  .ss-about-stage {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ss-page-content--about {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
   }
 }
 
@@ -1318,6 +1368,12 @@ html[data-about-active] .ss-about-content {
 }
 
 .ss-page-content--about {
+  position: relative;
+  z-index: 10;
+}
+
+.ss-about-statement-wrap {
+  width: 100%;
   max-width: 57.8125rem;
   margin-left: auto;
   margin-right: auto;
@@ -1326,8 +1382,11 @@ html[data-about-active] .ss-about-content {
 .ss-about-statement {
   color: var(--ink);
   margin: 0;
+  text-align: center;
   text-transform: uppercase;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.4;
 }
 
 [data-about-layer][data-moving] {

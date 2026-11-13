@@ -16,10 +16,14 @@ require get_template_directory() . '/template-parts/document-open.php';
     require get_template_directory() . '/template-parts/site-header.php';
     ?>
     <main class="ss-main ss-main--about">
-        <div class="ss-page-content ss-page-content--about">
-            <h1 class="font-display type-lede-fluid ss-about-statement">
-                <?php echo esc_html($about_statement); ?>
-            </h1>
+        <div class="ss-about-stage">
+            <div class="ss-page-content ss-page-content--about">
+                <div class="ss-about-statement-wrap">
+                    <h1 class="font-display type-heading-fluid ss-about-statement">
+                        <?php echo esc_html($about_statement); ?>
+                    </h1>
+                </div>
+            </div>
         </div>
     </main>
     </div>

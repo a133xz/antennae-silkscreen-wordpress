@@ -63,7 +63,7 @@ $logo_blend = !empty($ss_logo_blend);
     aria-hidden="true"
     data-visible="false"
 >
-    <div class="ss-mobile-nav-panel__top">
+    <div class="ss-mobile-nav-panel__top<?php echo ($static_mobile || $fix_mobile) ? ' ss-mobile-nav-panel__top--notch' : ''; ?>">
         <a href="<?php echo esc_url(home_url('/')); ?>" class="ss-logo" aria-label="Silkscreen">
             <?php get_template_part('template-parts/logo', null, array('blend' => $logo_blend)); ?>
         </a>

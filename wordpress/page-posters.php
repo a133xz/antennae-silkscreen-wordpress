@@ -23,22 +23,24 @@ require get_template_directory() . '/template-parts/document-open.php';
     ?>
     <main class="ss-main ss-main--posters">
         <h1 class="sr-only">Posters</h1>
-        <ul class="ss-posters-strip" data-posters-strip tabindex="0" aria-label="Posters">
-            <?php foreach ($posters as $project) : ?>
-                <li class="ss-poster-card">
-                    <a href="<?php echo esc_url($project['permalink']); ?>">
-                        <?php
-                        $img = !empty($project['poster']['src']) ? $project['poster'] : ($project['image'] ?? null);
-                        if ($img && !empty($img['src'])) :
-                            ?>
-                            <img src="<?php echo esc_url($img['src']); ?>" alt="<?php echo esc_attr($img['alt']); ?>" loading="lazy" draggable="false" />
-                        <?php endif; ?>
-                        <h2 class="ss-poster-caption-title"><?php echo esc_html($project['title']); ?></h2>
-                        <span class="ss-poster-caption-sub">View project &gt;</span>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <div class="ss-posters-stage">
+            <ul class="ss-posters-strip" data-posters-strip tabindex="0" aria-label="Posters">
+                <?php foreach ($posters as $project) : ?>
+                    <li class="ss-poster-card">
+                        <a href="<?php echo esc_url($project['permalink']); ?>">
+                            <?php
+                            $img = !empty($project['poster']['src']) ? $project['poster'] : ($project['image'] ?? null);
+                            if ($img && !empty($img['src'])) :
+                                ?>
+                                <img src="<?php echo esc_url($img['src']); ?>" alt="<?php echo esc_attr($img['alt']); ?>" draggable="false" />
+                            <?php endif; ?>
+                            <h2 class="ss-poster-caption-title"><?php echo esc_html($project['title']); ?></h2>
+                            <span class="ss-poster-caption-sub">View project &gt;</span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     </main>
     </div>
     <?php require get_template_directory() . '/template-parts/site-footer.php'; ?>
