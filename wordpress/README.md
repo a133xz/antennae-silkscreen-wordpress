@@ -4,7 +4,7 @@ Classic PHP theme (same ops model as `antennae-gabos-wordpress`), aligned with t
 
 ## Requirements
 
-- WordPress with **Advanced Custom Fields** installed
+- WordPress with **Advanced Custom Fields** (free is enough; gallery/repeater are not required)
 - Set **Settings → Reading** → “A static page” and choose your landing page as the front page
 
 ## Content model

@@ -27,5 +27,7 @@ function silkscreen_default_hero_slides() {
     return $hero;
 }
 
+const SILKSCREEN_PROJECT_STILL_SLOTS = 5;
+
 const SILKSCREEN_PROJECT_POST_TYPE = 'silkscreen_project';
 const SILKSCREEN_NEWS_POST_TYPE = 'silkscreen_news';

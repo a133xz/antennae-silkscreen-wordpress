@@ -19,7 +19,7 @@ function silkscreen_project_from_post(WP_Post $post) {
 
     $image = silkscreen_image('card_image', $id);
 
-    $stills = silkscreen_gallery('stills', $id);
+    $stills = silkscreen_project_stills($id);
     if (!$stills && $image) {
         $stills = array($image);
     }

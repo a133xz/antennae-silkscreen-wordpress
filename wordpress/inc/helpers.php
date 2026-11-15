@@ -58,6 +58,66 @@ function silkscreen_image($name, $post_id) {
     return null;
 }
 
+function silkscreen_acf_image_value($value) {
+    if (is_array($value) && !empty($value['url'])) {
+        return array(
+            'src' => $value['url'],
+            'alt' => isset($value['alt']) ? (string) $value['alt'] : '',
+        );
+    }
+    if (is_numeric($value)) {
+        $url = wp_get_attachment_url((int) $value);
+        if ($url) {
+            $alt = get_post_meta((int) $value, '_wp_attachment_image_alt', true);
+            return array('src' => $url, 'alt' => is_string($alt) ? $alt : '');
+        }
+    }
+    return null;
+}
+
+/**
+ * Project detail slider stills (ACF Free–compatible still_1…still_N fields).
+ */
+function silkscreen_project_stills($post_id) {
+    if (!$post_id || !function_exists('get_field')) {
+        return array();
+    }
+
+    $out = array();
+    foreach (range(1, SILKSCREEN_PROJECT_STILL_SLOTS) as $slot) {
+        $picture = silkscreen_image('still_' . $slot, $post_id);
+        if ($picture) {
+            $out[] = $picture;
+        }
+    }
+    if ($out) {
+        return $out;
+    }
+
+    $legacy = get_field('stills', $post_id);
+    if (!is_array($legacy) || !$legacy) {
+        return array();
+    }
+
+    if (isset($legacy['still_1'])) {
+        foreach (range(1, SILKSCREEN_PROJECT_STILL_SLOTS) as $slot) {
+            $picture = silkscreen_acf_image_value($legacy['still_' . $slot] ?? null);
+            if ($picture) {
+                $out[] = $picture;
+            }
+        }
+        return $out;
+    }
+
+    foreach ($legacy as $row) {
+        $picture = silkscreen_acf_image_value($row);
+        if ($picture) {
+            $out[] = $picture;
+        }
+    }
+    return $out;
+}
+
 function silkscreen_gallery($name, $post_id) {
     if (!$post_id || !function_exists('get_field')) {
         return array();

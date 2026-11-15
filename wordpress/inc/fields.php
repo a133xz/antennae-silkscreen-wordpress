@@ -23,8 +23,41 @@ function silkscreen_masonry_size_choices() {
     );
 }
 
+function silkscreen_project_still_fields() {
+    $fields = array(
+        array(
+            'key' => 'field_ss_project_stills_acc',
+            'label' => 'Detail stills',
+            'type' => 'accordion',
+            'open' => 1,
+            'multi_expand' => 1,
+        ),
+        array(
+            'key' => 'field_ss_project_stills_msg',
+            'type' => 'message',
+            'message' => 'Add slider images in order. Each still has an <strong>Add Image</strong> control; leave unused slots empty.',
+        ),
+    );
+    foreach (range(1, SILKSCREEN_PROJECT_STILL_SLOTS) as $slot) {
+        $fields[] = array(
+            'key' => 'field_ss_still_' . $slot,
+            'label' => sprintf('Still %d', $slot),
+            'name' => 'still_' . $slot,
+            'type' => 'image',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+        );
+    }
+    $fields[] = array(
+        'key' => 'field_ss_project_stills_acc_end',
+        'type' => 'accordion',
+        'endpoint' => 1,
+    );
+    return $fields;
+}
+
 function silkscreen_project_fields() {
-    return array(
+    return array_merge(array(
         array(
             'key' => 'field_ss_project_director',
             'label' => 'Director',
@@ -66,14 +99,7 @@ function silkscreen_project_fields() {
             'return_format' => 'array',
             'preview_size' => 'medium',
         ),
-        array(
-            'key' => 'field_ss_project_stills',
-            'label' => 'Detail stills',
-            'name' => 'stills',
-            'type' => 'gallery',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
-        ),
+    ), silkscreen_project_still_fields(), array(
         array(
             'key' => 'field_ss_project_credits',
             'label' => 'Credits',
@@ -107,7 +133,7 @@ function silkscreen_project_fields() {
                 ),
             ),
         ),
-    );
+    ));
 }
 
 function silkscreen_project_sidebar_fields() {

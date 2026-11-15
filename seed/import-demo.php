@@ -220,8 +220,8 @@ foreach ($data['projects'] as $row) {
             $still_ids[] = $sid;
         }
     }
-    if ($still_ids) {
-        update_field('stills', $still_ids, $post_id);
+    foreach ($still_ids as $index => $attachment_id) {
+        update_field('still_' . ($index + 1), $attachment_id, $post_id);
     }
 
     if (!empty($row['poster'])) {
