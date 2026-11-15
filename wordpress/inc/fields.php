@@ -260,6 +260,13 @@ function silkscreen_contact_fields() {
 function silkscreen_about_fields() {
     return array(
         array(
+            'key' => 'field_ss_about_tagline',
+            'label' => 'Tagline',
+            'name' => 'tagline',
+            'type' => 'text',
+            'default_value' => SILKSCREEN_TAGLINE,
+        ),
+        array(
             'key' => 'field_ss_about_statement',
             'label' => 'About statement',
             'name' => 'about_statement',
@@ -272,12 +279,9 @@ function silkscreen_about_fields() {
 
 function silkscreen_home_fields() {
     return array(
-        array('key' => 'field_ss_tagline', 'label' => 'Tagline', 'name' => 'tagline', 'type' => 'text', 'default_value' => SILKSCREEN_TAGLINE),
-        array('key' => 'field_ss_statement', 'label' => 'About statement', 'name' => 'statement', 'type' => 'textarea', 'rows' => 4, 'default_value' => SILKSCREEN_STATEMENT),
         array('key' => 'field_ss_copyright', 'label' => 'Copyright', 'name' => 'copyright', 'type' => 'text', 'default_value' => SILKSCREEN_COPYRIGHT),
         array('key' => 'field_ss_social_handle', 'label' => 'Social handle', 'name' => 'social_handle', 'type' => 'text', 'default_value' => SILKSCREEN_SOCIAL_HANDLE),
         array('key' => 'field_ss_social_url', 'label' => 'Social URL', 'name' => 'social_url', 'type' => 'url', 'default_value' => SILKSCREEN_SOCIAL_URL),
-        array('key' => 'field_ss_contact_intro', 'label' => 'Contact intro', 'name' => 'contact_intro', 'type' => 'textarea', 'rows' => 3, 'default_value' => SILKSCREEN_CONTACT_INTRO),
     );
 }
 
@@ -406,4 +410,14 @@ add_filter('acf/load_value/name=about_statement', function ($value, $post_id, $f
         return $value;
     }
     return SILKSCREEN_STATEMENT;
+}, 10, 3);
+
+add_filter('acf/load_value/name=tagline', function ($value, $post_id, $field) {
+    if ($value !== null && $value !== '') {
+        return $value;
+    }
+    if (get_post_meta($post_id, '_wp_page_template', true) !== 'page-about.php') {
+        return $value;
+    }
+    return SILKSCREEN_TAGLINE;
 }, 10, 3);

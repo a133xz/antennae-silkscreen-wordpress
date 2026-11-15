@@ -174,6 +174,6 @@ add_action('wp_head', function () {
     if (!is_front_page()) {
         return;
     }
-    $statement = silkscreen_text('statement', silkscreen_front_id(), SILKSCREEN_STATEMENT);
+    $statement = silkscreen_about_statement();
     echo '<meta name="description" content="' . esc_attr(wp_strip_all_tags($statement)) . '">' . "\n";
 }, 1);

@@ -1,6 +1,5 @@
 <?php
 $ss_theme = 'light';
-$settings = silkscreen_settings();
 $projects = silkscreen_featured_projects(2);
 $news = silkscreen_featured_news(3);
 $products = silkscreen_shop_available() ? silkscreen_featured_products(3) : array();

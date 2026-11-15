@@ -151,14 +151,13 @@ $home_id = silkscreen_seed_page('Home', 'home');
 $about_id = silkscreen_seed_page('About', 'about', 'page-about.php');
 $contact_id = silkscreen_seed_page('Contact', 'contact', 'page-contact.php');
 silkscreen_seed_page('Posters', 'posters', 'page-posters.php');
-$shop_id = silkscreen_seed_page('Shop settings', 'shop-settings', 'page-shop-settings.php');
+$shop_id = silkscreen_seed_page('Shop', 'shop-settings', 'page-shop-settings.php');
 
 update_option('show_on_front', 'page');
 update_option('page_on_front', $home_id);
 
 $s = $data['settings'];
-update_field('tagline', $s['tagline'], $home_id);
-update_field('statement', $s['statement'], $home_id);
+update_field('tagline', $s['tagline'], $about_id);
 update_field('about_statement', $s['statement'], $about_id);
 update_field('contact_intro', $s['contact_intro'], $contact_id);
 foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
@@ -169,8 +168,6 @@ foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
 update_field('copyright', $s['copyright'], $home_id);
 update_field('social_handle', $s['social_handle'], $home_id);
 update_field('social_url', $s['social_url'], $home_id);
-update_field('contact_intro', $s['contact_intro'], $home_id);
-
 update_field('shop_available', (bool) $s['shop_available'], $shop_id);
 foreach ($data['products'] as $i => $product) {
     $slot = $i + 1;

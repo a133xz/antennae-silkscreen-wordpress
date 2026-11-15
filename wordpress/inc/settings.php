@@ -34,12 +34,9 @@ function silkscreen_settings() {
     }
 
     $settings = array(
-        'tagline' => silkscreen_text('tagline', $front_id, SILKSCREEN_TAGLINE),
         'copyright' => silkscreen_text('copyright', $front_id, SILKSCREEN_COPYRIGHT),
         'social_handle' => silkscreen_text('social_handle', $front_id, SILKSCREEN_SOCIAL_HANDLE),
         'social_url' => silkscreen_url('social_url', $front_id, SILKSCREEN_SOCIAL_URL),
-        'statement' => silkscreen_text('statement', $front_id, SILKSCREEN_STATEMENT),
-        'contact_intro' => silkscreen_text('contact_intro', $front_id, SILKSCREEN_CONTACT_INTRO),
         'emails' => $emails,
         'hero' => silkscreen_default_hero_slides(),
     );
@@ -66,7 +63,7 @@ function silkscreen_about_page_id() {
 }
 
 /**
- * About headline: this page’s ACF → site settings on Home → approved default copy.
+ * About headline: About page ACF → approved default copy.
  */
 function silkscreen_about_statement($page_id = 0) {
     if (!$page_id) {
@@ -78,7 +75,20 @@ function silkscreen_about_statement($page_id = 0) {
             return $on_page;
         }
     }
-    return silkscreen_settings()['statement'];
+    return SILKSCREEN_STATEMENT;
+}
+
+function silkscreen_tagline($page_id = 0) {
+    if (!$page_id) {
+        $page_id = silkscreen_about_page_id();
+    }
+    if ($page_id) {
+        $on_page = silkscreen_text('tagline', $page_id, '');
+        if ($on_page !== '') {
+            return $on_page;
+        }
+    }
+    return SILKSCREEN_TAGLINE;
 }
 
 function silkscreen_contact_page_id() {
@@ -109,7 +119,7 @@ function silkscreen_contact_intro($page_id = 0) {
             return $on_page;
         }
     }
-    return silkscreen_settings()['contact_intro'];
+    return SILKSCREEN_CONTACT_INTRO;
 }
 
 function silkscreen_contact_emails($page_id = 0) {
