@@ -61,6 +61,17 @@ add_filter('template_include', function ($template) {
     if (get_query_var('silkscreen_shop')) {
         return get_template_directory() . '/page-shop.php';
     }
+    if (is_page() && !is_front_page()) {
+        $slug = get_post_field('post_name', get_queried_object_id());
+        $map = array(
+            'about' => 'page-about.php',
+            'contact' => 'page-contact.php',
+            'posters' => 'page-posters.php',
+        );
+        if (isset($map[$slug]) && str_ends_with($template, 'front-page.php')) {
+            return get_template_directory() . '/' . $map[$slug];
+        }
+    }
     return $template;
 });
 
@@ -72,6 +83,7 @@ add_filter('show_admin_bar', function ($show) {
 });
 
 remove_action('wp_enqueue_scripts', 'wp_enqueue_global_styles');
+remove_action('wp_footer', 'wp_enqueue_global_styles', 1);
 remove_action('wp_body_open', 'wp_global_styles_render_svg_filters');
 
 add_action('after_switch_theme', function () {

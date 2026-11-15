@@ -4,6 +4,15 @@ function silkscreen_asset($file) {
     return get_template_directory_uri() . '/assets/' . ltrim($file, '/');
 }
 
+function silkscreen_purge_site_cache() {
+    if (function_exists('litespeed_purge_all')) {
+        do_action('litespeed_purge_all');
+    }
+    if (function_exists('wp_cache_flush')) {
+        wp_cache_flush();
+    }
+}
+
 function silkscreen_front_id() {
     $id = (int) get_option('page_on_front');
     if ($id > 0) {

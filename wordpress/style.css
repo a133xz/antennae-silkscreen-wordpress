@@ -1540,6 +1540,17 @@ html[data-about-active] .ss-about-content {
   min-height: 0;
 }
 
+html[data-about-active] .ss-shell__viewport {
+  min-height: 100svh;
+}
+
+@media (max-width: 767px) {
+  html[data-about-active] .ss-about-stage {
+    flex: 1 1 auto;
+    min-height: calc(100svh + 8rem);
+  }
+}
+
 .ss-main--contact {
   display: flex;
   flex: 1;

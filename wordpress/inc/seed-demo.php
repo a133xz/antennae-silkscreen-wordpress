@@ -80,14 +80,38 @@ function silkscreen_seed_attach($filename, $alt, callable $log) {
     return $cache[$filename];
 }
 
+function silkscreen_seed_page_slugs() {
+    return array('home', 'about', 'contact', 'posters', 'shop-settings');
+}
+
+function silkscreen_seed_prune_duplicate_pages(callable $log) {
+    foreach (silkscreen_seed_page_slugs() as $slug) {
+        $pages = get_posts(array(
+            'post_type' => 'page',
+            'post_status' => array('publish', 'draft', 'private', 'pending', 'future'),
+            'name' => $slug,
+            'posts_per_page' => -1,
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'fields' => 'ids',
+        ));
+        if (count($pages) <= 1) {
+            continue;
+        }
+        $keep = (int) array_shift($pages);
+        foreach ($pages as $dup_id) {
+            $dup_id = (int) $dup_id;
+            wp_delete_post($dup_id, true);
+            $log("  Removed duplicate /{$slug}/ page (ID {$dup_id}, kept {$keep})");
+        }
+    }
+}
+
 function silkscreen_seed_page($title, $slug, $template = '') {
     $existing = get_page_by_path($slug, OBJECT, 'page');
-    if ($existing && !get_post_meta($existing->ID, '_silkscreen_demo', true)) {
-        $existing = null;
-    }
 
     $page_id = wp_insert_post(array(
-        'ID' => $existing ? $existing->ID : 0,
+        'ID' => $existing ? (int) $existing->ID : 0,
         'post_title' => $title,
         'post_name' => $slug,
         'post_type' => 'page',
@@ -139,6 +163,7 @@ function silkscreen_import_demo_data(array $options = array()) {
     if ($force) {
         $log('Removing previous demo content…');
         silkscreen_seed_purge();
+        silkscreen_seed_prune_duplicate_pages($log);
     }
 
     $log('Creating pages…');
@@ -280,7 +305,7 @@ function silkscreen_import_demo_data(array $options = array()) {
     flush_rewrite_rules(false);
     update_option('silkscreen_demo_seeded', '1');
     update_option('silkscreen_2026_rewrite', '1');
-
+    silkscreen_purge_site_cache();
     $log('Done. Home is set as the static front page.');
 
     return array('ok' => true, 'skipped' => false, 'messages' => $messages);
