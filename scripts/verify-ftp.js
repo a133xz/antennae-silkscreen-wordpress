@@ -20,7 +20,7 @@ import {
   withFtpClient,
 } from './deploy-common.js';
 
-const THEME_HEADER = /Theme Name:\s*Gabos 2026/i;
+const THEME_HEADER = /Theme Name:\s*Silkscreen 2026/i;
 
 function parseArgs(argv) {
   const args = { file: 'style.css', withinMinutes: 30, verbose: false };
@@ -59,7 +59,7 @@ function formatAge(ms) {
 }
 
 async function downloadToTemp(client, remote) {
-  const tmp = path.join(os.tmpdir(), `gabos-ftp-verify-${process.pid}-${path.basename(remote)}`);
+  const tmp = path.join(os.tmpdir(), `silkscreen-ftp-verify-${process.pid}-${path.basename(remote)}`);
   const dest = createWriteStream(tmp);
   await client.downloadTo(dest, remote);
   await finished(dest);
@@ -163,7 +163,7 @@ Uses the same .env and path rules as npm run deploy.
         const head = readFileSync(tmp, 'utf8').slice(0, 2048);
         themeHeaderOk = THEME_HEADER.test(head);
         process.stdout.write(
-          `\nRemote style.css Theme Name "Gabos 2026": ${themeHeaderOk ? 'yes' : 'no'}\n`,
+          `\nRemote style.css Theme Name "Silkscreen 2026": ${themeHeaderOk ? 'yes' : 'no'}\n`,
         );
       } finally {
         unlinkSync(tmp);
@@ -182,7 +182,7 @@ Uses the same .env and path rules as npm run deploy.
   process.stdout.write('  Paths aligned with deploy: yes\n');
   process.stdout.write('  Theme folder markers: style.css present\n');
   if (themeHeaderOk !== null) {
-    process.stdout.write(`  Correct theme (Gabos 2026): ${themeHeaderOk ? 'yes' : 'NO — wrong folder?'}\n`);
+    process.stdout.write(`  Correct theme (Silkscreen 2026): ${themeHeaderOk ? 'yes' : 'NO — wrong folder?'}\n`);
   }
   if (recentModifyOk !== null) {
     process.stdout.write(
