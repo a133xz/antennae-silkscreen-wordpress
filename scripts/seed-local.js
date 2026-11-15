@@ -21,7 +21,10 @@ const wpLoad =
   process.env.WP_LOAD_PATH ||
   '/Users/antonio/Local Sites/localpress/app/public/wp-load.php';
 
-const args = ['seed/import-demo.php', ...process.argv.slice(2)];
+const seedScript = existsSync(path.join(root, 'wordpress', 'seed', 'import-demo.php'))
+  ? path.join('wordpress', 'seed', 'import-demo.php')
+  : path.join('seed', 'import-demo.php');
+const args = [seedScript, ...process.argv.slice(2)];
 const env = {
   ...process.env,
   WP_LOAD_PATH: wpLoad,

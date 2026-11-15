@@ -34,4 +34,15 @@ After seeding, visit the site home URL. **Settings → Reading** should already 
 
 ```bash
 npm run seed:local
+npm run seed:local -- --force
 ```
+
+## Krystal (production)
+
+1. Deploy the theme (`npm run deploy -- --all`).
+2. Install **ACF**, activate **Silkscreen 2026**.
+3. In wp-admin open **Demo** (left menu) → **Import demo data**.
+   - First import: leave “Replace existing demo” unchecked.
+   - Re-import: check **Replace existing demo** (same as `--force`).
+
+Optional SSH: `php wp-content/themes/silkscreen-2026/seed/import-demo.php --force`

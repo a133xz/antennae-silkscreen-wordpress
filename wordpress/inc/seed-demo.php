@@ -1,0 +1,287 @@
+<?php
+
+/**
+ * Shared demo import (CLI + wp-admin Demo screen).
+ */
+
+function silkscreen_seed_records_path() {
+    $path = get_template_directory() . '/seed/records.php';
+    if (!is_file($path)) {
+        throw new RuntimeException('Missing theme file seed/records.php — deploy the theme again.');
+    }
+    return $path;
+}
+
+function silkscreen_seed_demo_posts() {
+    return get_posts(array(
+        'post_type' => array('page', SILKSCREEN_PROJECT_POST_TYPE, SILKSCREEN_NEWS_POST_TYPE, 'attachment'),
+        'post_status' => array('publish', 'draft', 'inherit', 'private'),
+        'posts_per_page' => -1,
+        'meta_key' => '_silkscreen_demo',
+        'meta_value' => '1',
+        'fields' => 'ids',
+        'no_found_rows' => true,
+    ));
+}
+
+function silkscreen_seed_purge() {
+    foreach (silkscreen_seed_demo_posts() as $post_id) {
+        wp_delete_post((int) $post_id, true);
+    }
+}
+
+function silkscreen_seed_media_file($filename) {
+    $path = get_template_directory() . '/assets/media/' . ltrim($filename, '/');
+    return is_file($path) ? $path : null;
+}
+
+function silkscreen_seed_attach($filename, $alt, callable $log) {
+    static $cache = array();
+    if (isset($cache[$filename])) {
+        return $cache[$filename];
+    }
+    $path = silkscreen_seed_media_file($filename);
+    if (!$path) {
+        $log("  ! missing asset: {$filename}");
+        $cache[$filename] = 0;
+        return 0;
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
+    $bits = wp_upload_bits(basename($path), null, file_get_contents($path));
+    if (!empty($bits['error'])) {
+        $log("  ! upload failed {$filename}: {$bits['error']}");
+        $cache[$filename] = 0;
+        return 0;
+    }
+
+    $filetype = wp_check_filetype(basename($path), null);
+    $attachment = array(
+        'post_mime_type' => $filetype['type'],
+        'post_title' => sanitize_file_name(pathinfo($path, PATHINFO_FILENAME)),
+        'post_content' => '',
+        'post_status' => 'inherit',
+    );
+    $attach_id = wp_insert_attachment($attachment, $bits['file']);
+    if (is_wp_error($attach_id) || !$attach_id) {
+        $cache[$filename] = 0;
+        return 0;
+    }
+
+    wp_update_attachment_metadata($attach_id, wp_generate_attachment_metadata($attach_id, $bits['file']));
+    if ($alt !== '') {
+        update_post_meta($attach_id, '_wp_attachment_image_alt', $alt);
+    }
+    update_post_meta($attach_id, '_silkscreen_demo', '1');
+    $cache[$filename] = (int) $attach_id;
+    return $cache[$filename];
+}
+
+function silkscreen_seed_page($title, $slug, $template = '') {
+    $existing = get_page_by_path($slug, OBJECT, 'page');
+    if ($existing && !get_post_meta($existing->ID, '_silkscreen_demo', true)) {
+        $existing = null;
+    }
+
+    $page_id = wp_insert_post(array(
+        'ID' => $existing ? $existing->ID : 0,
+        'post_title' => $title,
+        'post_name' => $slug,
+        'post_type' => 'page',
+        'post_status' => 'publish',
+        'post_content' => '',
+    ), true);
+
+    if (is_wp_error($page_id)) {
+        throw new RuntimeException($page_id->get_error_message());
+    }
+
+    update_post_meta($page_id, '_silkscreen_demo', '1');
+    if ($template !== '') {
+        update_post_meta($page_id, '_wp_page_template', $template);
+    }
+
+    return (int) $page_id;
+}
+
+/**
+ * @param array{force?: bool, log?: callable|null} $options
+ * @return array{ok: bool, skipped: bool, messages: string[]}
+ */
+function silkscreen_import_demo_data(array $options = array()) {
+    $force = !empty($options['force']);
+    $messages = array();
+    $log = isset($options['log']) && is_callable($options['log'])
+        ? $options['log']
+        : static function ($line) use (&$messages) {
+            $messages[] = (string) $line;
+        };
+
+    if (!function_exists('get_field')) {
+        throw new RuntimeException('Advanced Custom Fields must be installed and active.');
+    }
+
+    if (!$force && get_option('silkscreen_demo_seeded') === '1') {
+        $log('Demo content already imported. Enable “Replace existing demo” to run again.');
+        return array('ok' => true, 'skipped' => true, 'messages' => $messages);
+    }
+
+    @set_time_limit(600);
+    if (function_exists('wp_raise_memory_limit')) {
+        wp_raise_memory_limit('admin');
+    }
+
+    $data = require silkscreen_seed_records_path();
+
+    if ($force) {
+        $log('Removing previous demo content…');
+        silkscreen_seed_purge();
+    }
+
+    $log('Creating pages…');
+    $home_id = silkscreen_seed_page('Home', 'home');
+    $about_id = silkscreen_seed_page('About', 'about', 'page-about.php');
+    $contact_id = silkscreen_seed_page('Contact', 'contact', 'page-contact.php');
+    silkscreen_seed_page('Posters', 'posters', 'page-posters.php');
+    $shop_id = silkscreen_seed_page('Shop', 'shop-settings', 'page-shop-settings.php');
+
+    update_option('show_on_front', 'page');
+    update_option('page_on_front', $home_id);
+
+    $s = $data['settings'];
+    update_field('about_statement', $s['statement'], $about_id);
+    update_field('contact_intro', $s['contact_intro'], $contact_id);
+    foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
+        $row = $s['emails'][$slot - 1] ?? array('label' => '', 'address' => '');
+        update_field('contact_email_' . $slot . '_label', $row['label'], $contact_id);
+        update_field('contact_email_' . $slot . '_address', $row['address'], $contact_id);
+    }
+    update_field('copyright', $s['copyright'], $home_id);
+    update_field('social_handle', $s['social_handle'], $home_id);
+    update_field('social_url', $s['social_url'], $home_id);
+    update_field('shop_available', (bool) $s['shop_available'], $shop_id);
+    foreach ($data['products'] as $i => $product) {
+        $slot = $i + 1;
+        $prefix = 'shop_product_' . $slot . '_';
+        update_field($prefix . 'title', $product['title'], $shop_id);
+        update_field($prefix . 'slug', $product['slug'], $shop_id);
+        update_field($prefix . 'price', $product['price'], $shop_id);
+        update_field($prefix . 'featured', (bool) $product['featured'], $shop_id);
+        $image_id = silkscreen_seed_attach($product['image'], $product['alt'], $log);
+        if ($image_id) {
+            update_field($prefix . 'card_image', $image_id, $shop_id);
+        }
+    }
+
+    $log('Creating projects…');
+    $projects_missing_stills = array();
+    foreach ($data['projects'] as $row) {
+        $post_id = wp_insert_post(array(
+            'post_title' => $row['title'],
+            'post_name' => $row['slug'],
+            'post_type' => SILKSCREEN_PROJECT_POST_TYPE,
+            'post_status' => 'publish',
+            'menu_order' => (int) $row['order'],
+        ), true);
+        if (is_wp_error($post_id)) {
+            throw new RuntimeException($post_id->get_error_message());
+        }
+        $post_id = (int) $post_id;
+        update_post_meta($post_id, '_silkscreen_demo', '1');
+
+        update_field('director', $row['director'] ?? '', $post_id);
+        update_field('synopsis', $row['synopsis'] ?? '', $post_id);
+        update_field('featured', !empty($row['featured']), $post_id);
+        update_field('on_posters', !empty($row['on_posters']), $post_id);
+
+        if (!empty($row['image'])) {
+            $card_id = silkscreen_seed_attach($row['image'], $row['image_alt'] ?? $row['title'], $log);
+            if ($card_id) {
+                update_field('card_image', $card_id, $post_id);
+            }
+        }
+
+        $still_ids = array();
+        foreach ($row['stills'] ?? array($row['image'] ?? '') as $still) {
+            if ($still === '') {
+                continue;
+            }
+            $sid = silkscreen_seed_attach($still, $row['image_alt'] ?? $row['title'], $log);
+            if ($sid) {
+                $still_ids[] = $sid;
+            }
+        }
+        if ($still_ids) {
+            update_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, wp_json_encode($still_ids));
+        } else {
+            $projects_missing_stills[] = $row['slug'];
+        }
+
+        if (!empty($row['poster'])) {
+            $poster_id = silkscreen_seed_attach($row['poster'], $row['poster_alt'] ?? ($row['title'] . ' poster'), $log);
+            if ($poster_id) {
+                update_field('poster', $poster_id, $post_id);
+            }
+        }
+
+        if (!empty($row['credits'])) {
+            $credit_rows = array();
+            foreach ($row['credits'] as $credit) {
+                $credit_rows[] = array(
+                    'role' => $credit['role'],
+                    'custom_label' => '',
+                    'names' => $credit['names'],
+                );
+            }
+            update_post_meta($post_id, SILKSCREEN_PROJECT_CREDITS_META, wp_json_encode($credit_rows));
+        }
+    }
+
+    if ($projects_missing_stills) {
+        $log('  ! projects with no slider stills (check assets/media/): ' . implode(', ', $projects_missing_stills));
+    }
+
+    $log('Creating news…');
+    foreach ($data['news'] as $row) {
+        $post_id = wp_insert_post(array(
+            'post_title' => $row['title'],
+            'post_name' => sanitize_title($row['title'] . '-' . $row['order']),
+            'post_type' => SILKSCREEN_NEWS_POST_TYPE,
+            'post_status' => 'publish',
+            'menu_order' => (int) $row['order'],
+            'post_excerpt' => $row['excerpt'] ?? '',
+        ), true);
+        if (is_wp_error($post_id)) {
+            throw new RuntimeException($post_id->get_error_message());
+        }
+        $post_id = (int) $post_id;
+        update_post_meta($post_id, '_silkscreen_demo', '1');
+
+        update_field('kicker', $row['kicker'] ?? '', $post_id);
+        update_field('date_label', $row['date_label'] ?? '', $post_id);
+        $size = $row['size'] ?? 'medium';
+        if ($size === 'small') {
+            $size = 'narrow';
+        }
+        update_field('masonry_size', $size, $post_id);
+        update_field('featured', !empty($row['featured']), $post_id);
+
+        if (!empty($row['image'])) {
+            $image_id = silkscreen_seed_attach($row['image'], $row['image_alt'] ?? '', $log);
+            if ($image_id) {
+                update_field('news_image', $image_id, $post_id);
+            }
+        }
+    }
+
+    flush_rewrite_rules(false);
+    update_option('silkscreen_demo_seeded', '1');
+    update_option('silkscreen_2026_rewrite', '1');
+
+    $log('Done. Home is set as the static front page.');
+
+    return array('ok' => true, 'skipped' => false, 'messages' => $messages);
+}

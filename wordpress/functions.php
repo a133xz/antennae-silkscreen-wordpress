@@ -11,6 +11,8 @@ require get_template_directory() . '/inc/fields.php';
 require get_template_directory() . '/inc/admin-cleanup.php';
 require get_template_directory() . '/inc/admin-project-credits.php';
 require get_template_directory() . '/inc/admin-project-stills.php';
+require get_template_directory() . '/inc/seed-demo.php';
+require get_template_directory() . '/inc/admin-demo.php';
 
 add_filter('acf/update_value', function ($value, $post_id, $field) {
     if (!is_array($field) || !is_string($value)) {
