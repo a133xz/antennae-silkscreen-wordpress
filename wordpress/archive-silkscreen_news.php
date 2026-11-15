@@ -3,7 +3,7 @@ $ss_theme = 'light';
 $ss_surface = '#f9f9f9';
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
-<div class="ss-shell ss-shell--surface" data-theme="light" style="background:#f9f9f9">
+<div class="ss-shell ss-shell--surface" data-theme="light" style="--ss-surface:#f9f9f9;background:#f9f9f9">
     <div class="ss-shell__viewport">
     <?php require get_template_directory() . '/template-parts/site-header.php'; ?>
     <main class="ss-main ss-main--pad-header">

@@ -24,7 +24,7 @@ $logo_blend = !empty($ss_logo_blend);
     data-site-header
     <?php echo $static_mobile ? ' data-static-mobile-header' : ''; ?>
     <?php echo $fix_mobile ? ' data-fix-mobile-header' : ''; ?>
-    class="<?php echo esc_attr(trim($header_class . ($after_hero ? ' ss-header--after-hero' : ''))); ?>"
+    class="<?php echo esc_attr(trim($header_class . ($after_hero ? ' ss-header--after-hero' : '') . ($transparent ? ' ss-header--transparent-mobile' : ''))); ?>"
 >
     <?php if ($fix_mobile && !$transparent) : ?>
         <div class="ss-header-fill-wrap" aria-hidden="true">

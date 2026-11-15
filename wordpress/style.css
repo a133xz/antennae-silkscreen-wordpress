@@ -142,7 +142,11 @@ body.silkscreen-theme a:visited {
   min-height: 100svh;
 }
 
-.ss-shell--surface { background-color: var(--ss-surface, var(--paper)); }
+.ss-shell--surface {
+  background-color: var(--ss-surface, var(--paper));
+  --canvas: var(--ss-surface, var(--paper));
+}
+
 .ss-shell--transparent { background-color: transparent; }
 
 .ss-mark {
@@ -243,6 +247,15 @@ body.silkscreen-theme a:visited {
   [data-site-header][data-static-mobile-header] {
     position: relative;
     transform: none;
+    background-color: var(--canvas, var(--paper));
+    background-image: var(--canvas-image, none);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  [data-site-header][data-static-mobile-header].ss-header--transparent-mobile {
+    background: transparent;
   }
 
   html[data-scroll-locked] [data-site-header] {
@@ -445,6 +458,11 @@ body.silkscreen-theme a:visited {
   background-color: #fff !important;
   background-image: none !important;
   color: #000 !important;
+}
+
+[data-mobile-nav-panel][data-menu-light] .ss-mobile-nav-toggle,
+[data-mobile-nav-panel][data-menu-light] [data-site-nav] a {
+  color: #000;
 }
 
 html[data-about-active] [data-mobile-nav-panel][data-menu-light],
@@ -1544,13 +1562,6 @@ html[data-about-active] .ss-shell__viewport {
   min-height: 100svh;
 }
 
-@media (max-width: 767px) {
-  html[data-about-active] .ss-about-stage {
-    flex: 1 1 auto;
-    min-height: calc(100svh + 8rem);
-  }
-}
-
 .ss-main--contact {
   display: flex;
   flex: 1;
@@ -1560,15 +1571,38 @@ html[data-about-active] .ss-shell__viewport {
 }
 
 @media (max-width: 767px) {
+  html[data-about-active] .ss-about-stage {
+    flex: 1 1 auto;
+    min-height: calc(100svh + 8rem);
+    justify-content: center;
+  }
+
   .ss-about-stage {
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
   }
 
   .ss-page-content--about {
     display: flex;
     flex: 1 1 auto;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .ss-about-statement-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .ss-about-statement {
+    width: 100%;
+    text-wrap: balance;
   }
 }
 
