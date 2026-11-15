@@ -232,15 +232,15 @@ foreach ($data['projects'] as $row) {
     }
 
     if (!empty($row['credits'])) {
-        $credit_rows = array();
-        foreach ($row['credits'] as $credit) {
-            $credit_rows[] = array(
-                'role' => $credit['role'],
-                'custom_label' => '',
-                'names' => implode("\n", $credit['names']),
-            );
+        foreach ($row['credits'] as $index => $credit) {
+            $slot = $index + 1;
+            if ($slot > SILKSCREEN_PROJECT_CREDIT_SLOTS) {
+                break;
+            }
+            update_field('credit_' . $slot . '_role', $credit['role'], $post_id);
+            update_field('credit_' . $slot . '_custom_label', '', $post_id);
+            update_field('credit_' . $slot . '_names', implode("\n", $credit['names']), $post_id);
         }
-        update_field('credits', $credit_rows, $post_id);
     }
 }
 

@@ -26,24 +26,7 @@ function silkscreen_project_from_post(WP_Post $post) {
 
     $poster = silkscreen_image('poster', $id);
 
-    $credits = array();
-    if (function_exists('get_field')) {
-        $rows = get_field('credits', $id);
-        if (is_array($rows)) {
-            foreach ($rows as $row) {
-                if (!is_array($row)) {
-                    continue;
-                }
-                $names_raw = isset($row['names']) ? (string) $row['names'] : '';
-                $names = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n|,/', $names_raw))));
-                $credits[] = array(
-                    'role' => isset($row['role']) ? (string) $row['role'] : 'custom',
-                    'custom_label' => isset($row['custom_label']) ? (string) $row['custom_label'] : '',
-                    'names' => $names,
-                );
-            }
-        }
-    }
+    $credits = silkscreen_project_credits($id);
 
     $on_posters = silkscreen_bool('on_posters', $id, false);
     $synopsis = function_exists('get_field') ? (string) get_field('synopsis', $id) : '';

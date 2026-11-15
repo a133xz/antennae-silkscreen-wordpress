@@ -118,6 +118,57 @@ function silkscreen_project_stills($post_id) {
     return $out;
 }
 
+function silkscreen_parse_credit_names($raw) {
+    return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n|,/', (string) $raw))));
+}
+
+function silkscreen_project_credits($post_id) {
+    if (!$post_id || !function_exists('get_field')) {
+        return array();
+    }
+
+    $credits = array();
+    foreach (range(1, SILKSCREEN_PROJECT_CREDIT_SLOTS) as $slot) {
+        $names_raw = (string) get_field('credit_' . $slot . '_names', $post_id);
+        $names = silkscreen_parse_credit_names($names_raw);
+        if (!$names) {
+            continue;
+        }
+        $role = (string) get_field('credit_' . $slot . '_role', $post_id);
+        if ($role === '') {
+            $role = 'custom';
+        }
+        $credits[] = array(
+            'role' => $role,
+            'custom_label' => (string) get_field('credit_' . $slot . '_custom_label', $post_id),
+            'names' => $names,
+        );
+    }
+    if ($credits) {
+        return $credits;
+    }
+
+    $rows = get_field('credits', $post_id);
+    if (!is_array($rows)) {
+        return array();
+    }
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $names = silkscreen_parse_credit_names($row['names'] ?? '');
+        if (!$names) {
+            continue;
+        }
+        $credits[] = array(
+            'role' => isset($row['role']) ? (string) $row['role'] : 'custom',
+            'custom_label' => isset($row['custom_label']) ? (string) $row['custom_label'] : '',
+            'names' => $names,
+        );
+    }
+    return $credits;
+}
+
 function silkscreen_gallery($name, $post_id) {
     if (!$post_id || !function_exists('get_field')) {
         return array();

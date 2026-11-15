@@ -56,6 +56,57 @@ function silkscreen_project_still_fields() {
     return $fields;
 }
 
+function silkscreen_project_credit_fields() {
+    $fields = array(
+        array(
+            'key' => 'field_ss_project_credits_acc',
+            'label' => 'Credits',
+            'type' => 'accordion',
+            'open' => 0,
+            'multi_expand' => 1,
+        ),
+        array(
+            'key' => 'field_ss_project_credits_msg',
+            'type' => 'message',
+            'message' => 'Add up to ' . SILKSCREEN_PROJECT_CREDIT_SLOTS . ' credit rows. Names can be separated by commas or line breaks. Skip empty rows.',
+        ),
+    );
+    foreach (range(1, SILKSCREEN_PROJECT_CREDIT_SLOTS) as $slot) {
+        $role_key = 'field_ss_credit_' . $slot . '_role';
+        $fields[] = array(
+            'key' => $role_key,
+            'label' => sprintf('Credit %d — role', $slot),
+            'name' => 'credit_' . $slot . '_role',
+            'type' => 'select',
+            'choices' => silkscreen_credit_role_choices(),
+            'allow_null' => 1,
+            'ui' => 0,
+        );
+        $fields[] = array(
+            'key' => 'field_ss_credit_' . $slot . '_custom',
+            'label' => sprintf('Credit %d — custom label', $slot),
+            'name' => 'credit_' . $slot . '_custom_label',
+            'type' => 'text',
+            'conditional_logic' => array(
+                array(array('field' => $role_key, 'operator' => '==', 'value' => 'custom')),
+            ),
+        );
+        $fields[] = array(
+            'key' => 'field_ss_credit_' . $slot . '_names',
+            'label' => sprintf('Credit %d — names', $slot),
+            'name' => 'credit_' . $slot . '_names',
+            'type' => 'textarea',
+            'rows' => 2,
+        );
+    }
+    $fields[] = array(
+        'key' => 'field_ss_project_credits_acc_end',
+        'type' => 'accordion',
+        'endpoint' => 1,
+    );
+    return $fields;
+}
+
 function silkscreen_project_fields() {
     return array_merge(array(
         array(
@@ -99,41 +150,7 @@ function silkscreen_project_fields() {
             'return_format' => 'array',
             'preview_size' => 'medium',
         ),
-    ), silkscreen_project_still_fields(), array(
-        array(
-            'key' => 'field_ss_project_credits',
-            'label' => 'Credits',
-            'name' => 'credits',
-            'type' => 'repeater',
-            'layout' => 'row',
-            'button_label' => 'Add credit row',
-            'sub_fields' => array(
-                array(
-                    'key' => 'field_ss_credit_role',
-                    'label' => 'Role',
-                    'name' => 'role',
-                    'type' => 'select',
-                    'choices' => silkscreen_credit_role_choices(),
-                ),
-                array(
-                    'key' => 'field_ss_credit_custom',
-                    'label' => 'Custom label',
-                    'name' => 'custom_label',
-                    'type' => 'text',
-                    'conditional_logic' => array(
-                        array(array('field' => 'field_ss_credit_role', 'operator' => '==', 'value' => 'custom')),
-                    ),
-                ),
-                array(
-                    'key' => 'field_ss_credit_names',
-                    'label' => 'Names (comma or line separated)',
-                    'name' => 'names',
-                    'type' => 'textarea',
-                    'rows' => 2,
-                ),
-            ),
-        ),
-    ));
+    ), silkscreen_project_still_fields(), silkscreen_project_credit_fields());
 }
 
 function silkscreen_project_sidebar_fields() {
