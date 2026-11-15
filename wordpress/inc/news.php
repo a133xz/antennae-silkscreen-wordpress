@@ -1,19 +1,5 @@
 <?php
 
-/**
- * News layout types (matches Next caption modes + compact row).
- * - caption_below: title/kicker under the image (default masonry).
- * - caption_overlay: type on top of the image.
- * - compact: narrow/small tile with tighter type (shop-window style).
- */
-function silkscreen_news_layout_choices() {
-    return array(
-        'caption_below' => 'Caption below image',
-        'caption_overlay' => 'Caption overlay on image',
-        'compact' => 'Compact tile',
-    );
-}
-
 function silkscreen_news_from_post(WP_Post $post) {
     $id = $post->ID;
 
@@ -22,14 +8,14 @@ function silkscreen_news_from_post(WP_Post $post) {
         $image = array('src' => '', 'alt' => '');
     }
 
-    $layout = function_exists('get_field') ? (string) get_field('news_layout', $id) : 'caption_below';
-    if ($layout === '') {
-        $layout = 'caption_below';
-    }
-
     $size = function_exists('get_field') ? (string) get_field('masonry_size', $id) : 'medium';
-    if ($layout === 'compact' && !in_array($size, array('narrow', 'small'), true)) {
-        $size = 'small';
+    $allowed = array_keys(silkscreen_news_tile_size_choices());
+    if ($size === 'small' || in_array($size, $allowed, true)) {
+        // Legacy `small` keeps its short frame; new items use the five sizes only.
+    } elseif ($size === '') {
+        $size = 'medium';
+    } else {
+        $size = 'medium';
     }
 
     $excerpt = get_post_field('post_excerpt', $id);
@@ -44,7 +30,6 @@ function silkscreen_news_from_post(WP_Post $post) {
         'date_label' => function_exists('get_field') ? (string) get_field('date_label', $id) : '',
         'image' => $image,
         'size' => $size,
-        'layout' => $layout,
         'excerpt' => $excerpt,
         'featured' => silkscreen_bool('featured', $id, false),
         'order' => (int) $post->menu_order,

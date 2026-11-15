@@ -62,18 +62,16 @@ add_action('manage_' . SILKSCREEN_PROJECT_POST_TYPE . '_posts_custom_column', fu
 }, 10, 2);
 
 add_filter('manage_' . SILKSCREEN_NEWS_POST_TYPE . '_posts_columns', function ($columns) {
-    $columns['ss_layout'] = 'Layout';
-    $columns['ss_size'] = 'Masonry size';
+    $columns['ss_size'] = 'Size';
     $columns['ss_featured'] = 'Featured';
     return $columns;
 });
 
 add_action('manage_' . SILKSCREEN_NEWS_POST_TYPE . '_posts_custom_column', function ($column, $post_id) {
-    if ($column === 'ss_layout' && function_exists('get_field')) {
-        echo esc_html((string) get_field('news_layout', $post_id));
-    }
     if ($column === 'ss_size' && function_exists('get_field')) {
-        echo esc_html((string) get_field('masonry_size', $post_id));
+        $size = (string) get_field('masonry_size', $post_id);
+        $choices = silkscreen_news_tile_size_choices();
+        echo esc_html(isset($choices[$size]) ? $choices[$size] : ($size !== '' ? $size : '—'));
     }
     if ($column === 'ss_featured') {
         echo function_exists('get_field') && get_field('featured', $post_id) ? 'Yes' : '—';

@@ -269,8 +269,11 @@ foreach ($data['news'] as $row) {
 
     update_field('kicker', $row['kicker'] ?? '', $post_id);
     update_field('date_label', $row['date_label'] ?? '', $post_id);
-    update_field('news_layout', 'caption_below', $post_id);
-    update_field('masonry_size', $row['size'] ?? 'medium', $post_id);
+    $size = $row['size'] ?? 'medium';
+    if ($size === 'small') {
+        $size = 'narrow';
+    }
+    update_field('masonry_size', $size, $post_id);
     update_field('featured', !empty($row['featured']), $post_id);
 
     if (!empty($row['image'])) {

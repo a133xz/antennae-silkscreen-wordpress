@@ -12,7 +12,7 @@ Classic PHP theme (same ops model as `antennae-gabos-wordpress`), aligned with t
 | Type | Use |
 |------|-----|
 | **Projects** (`silkscreen_project`) | Films / poster titles — replace Gabos “posts”. Full ACF panel for director, stills, credits, featured, posters, etc. |
-| **News** (`silkscreen_news`) | Masony items with **three layout types**: caption below, caption overlay, compact — plus masonry size (narrow → half-short). |
+| **News** (`silkscreen_news`) | Masonry tiles — pick one of **five sizes** (narrow, medium, wide, half, half short). |
 | **Front page** ACF | Footer/social site settings (copyright, social links) |
 | **About** page (`page-about.php`) | About statement |
 | **Contact** page (`page-contact.php`) | Intro + 3 primary emails (label + address each) |

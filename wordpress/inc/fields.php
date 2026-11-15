@@ -12,14 +12,14 @@ function silkscreen_credit_role_choices() {
     );
 }
 
-function silkscreen_masonry_size_choices() {
+/** Five news tile sizes from the Figma / Next masonry grid. */
+function silkscreen_news_tile_size_choices() {
     return array(
-        'narrow' => 'Narrow (3 cols)',
-        'medium' => 'Medium (4 cols)',
-        'wide' => 'Wide (5 cols)',
-        'half' => 'Half (6 cols)',
-        'half-short' => 'Half short (6 cols)',
-        'small' => 'Small (3 cols)',
+        'narrow' => 'Narrow',
+        'medium' => 'Medium',
+        'wide' => 'Wide',
+        'half' => 'Half',
+        'half-short' => 'Half short',
     );
 }
 
@@ -145,20 +145,11 @@ function silkscreen_news_sidebar_fields() {
     return array(
         array(
             'key' => 'field_ss_news_size',
-            'label' => 'Masonry size',
+            'label' => 'Size',
             'name' => 'masonry_size',
             'type' => 'select',
-            'choices' => silkscreen_masonry_size_choices(),
+            'choices' => silkscreen_news_tile_size_choices(),
             'default_value' => 'medium',
-        ),
-        array(
-            'key' => 'field_ss_news_layout',
-            'label' => 'News layout',
-            'name' => 'news_layout',
-            'type' => 'select',
-            'choices' => silkscreen_news_layout_choices(),
-            'default_value' => 'caption_below',
-            'instructions' => 'Three masonry layouts: caption below, overlay on image, or compact tile.',
         ),
         array(
             'key' => 'field_ss_news_featured',

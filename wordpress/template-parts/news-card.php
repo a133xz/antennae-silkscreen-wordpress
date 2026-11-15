@@ -8,16 +8,10 @@ if (!empty($args) && is_array($args)) {
     $title_tag = isset($title_tag) ? $title_tag : 'h2';
     $scroll_reveal = !empty($scroll_reveal);
 }
-$layout = isset($item['layout']) ? $item['layout'] : 'caption_below';
 $size = isset($item['size']) ? $item['size'] : 'medium';
 list($w, $h) = silkscreen_news_frame_dimensions($size);
 $kicker = trim(strtolower($item['kicker'] ?? '') . '  ' . ($item['date_label'] ?? ''));
 $card_class = 'ss-news-card group';
-if ($layout === 'caption_overlay') {
-    $card_class .= ' ss-news-card--overlay';
-} elseif ($layout === 'compact') {
-    $card_class .= ' ss-news-card--compact';
-}
 if ($scroll_reveal) {
     $card_class .= ' ss-news-reveal';
 }
