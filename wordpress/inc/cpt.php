@@ -41,7 +41,7 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-megaphone',
         'has_archive' => 'news',
         'rewrite' => array('slug' => 'news', 'with_front' => false),
-        'supports' => array('title', 'thumbnail', 'page-attributes', 'excerpt'),
+        'supports' => array('title', 'page-attributes'),
         'show_in_rest' => false,
     ));
 });

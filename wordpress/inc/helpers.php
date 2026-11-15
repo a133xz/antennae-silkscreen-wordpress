@@ -75,15 +75,74 @@ function silkscreen_acf_image_value($value) {
     return null;
 }
 
+function silkscreen_picture_from_attachment($attachment_id) {
+    $attachment_id = (int) $attachment_id;
+    if ($attachment_id <= 0) {
+        return null;
+    }
+    $url = wp_get_attachment_image_url($attachment_id, 'full');
+    if (!$url) {
+        return null;
+    }
+    $alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+    return array(
+        'src' => $url,
+        'alt' => is_string($alt) ? $alt : '',
+    );
+}
+
+function silkscreen_project_still_attachment_ids($post_id) {
+    if (!$post_id) {
+        return array();
+    }
+
+    $json = get_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, true);
+    if (is_string($json) && $json !== '') {
+        $ids = json_decode($json, true);
+        if (is_array($ids)) {
+            return array_values(array_filter(array_map('intval', $ids)));
+        }
+    }
+
+    if (!function_exists('get_field')) {
+        return array();
+    }
+
+    $ids = array();
+    foreach (range(1, SILKSCREEN_PROJECT_STILL_SLOTS) as $slot) {
+        $value = get_field('still_' . $slot, $post_id);
+        if (is_array($value) && !empty($value['ID'])) {
+            $ids[] = (int) $value['ID'];
+        } elseif (is_numeric($value)) {
+            $ids[] = (int) $value;
+        }
+    }
+    return $ids;
+}
+
 /**
- * Project detail slider stills (ACF Free–compatible still_1…still_N fields).
+ * Project detail slider stills.
  */
 function silkscreen_project_stills($post_id) {
-    if (!$post_id || !function_exists('get_field')) {
+    if (!$post_id) {
         return array();
     }
 
     $out = array();
+    foreach (silkscreen_project_still_attachment_ids($post_id) as $attachment_id) {
+        $picture = silkscreen_picture_from_attachment($attachment_id);
+        if ($picture) {
+            $out[] = $picture;
+        }
+    }
+    if ($out) {
+        return $out;
+    }
+
+    if (!function_exists('get_field')) {
+        return array();
+    }
+
     foreach (range(1, SILKSCREEN_PROJECT_STILL_SLOTS) as $slot) {
         $picture = silkscreen_image('still_' . $slot, $post_id);
         if ($picture) {
@@ -118,55 +177,94 @@ function silkscreen_project_stills($post_id) {
     return $out;
 }
 
-function silkscreen_parse_credit_names($raw) {
-    return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n|,/', (string) $raw))));
+function silkscreen_sanitize_unicode_text($text) {
+    $text = wp_unslash((string) $text);
+    $text = wp_check_invalid_utf8($text, true);
+    $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $text);
+    return trim($text);
 }
 
-function silkscreen_project_credits($post_id) {
-    if (!$post_id || !function_exists('get_field')) {
+function silkscreen_parse_credit_names($raw) {
+    $raw = wp_check_invalid_utf8(wp_unslash((string) $raw), true);
+    return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n|,/', $raw))));
+}
+
+function silkscreen_normalize_credit_rows($rows) {
+    if (!is_array($rows)) {
         return array();
     }
-
     $credits = array();
-    foreach (range(1, SILKSCREEN_PROJECT_CREDIT_SLOTS) as $slot) {
-        $names_raw = (string) get_field('credit_' . $slot . '_names', $post_id);
-        $names = silkscreen_parse_credit_names($names_raw);
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        if (isset($row['names']) && is_array($row['names'])) {
+            $names = array_values(array_filter(array_map('trim', $row['names'])));
+        } else {
+            $names = silkscreen_parse_credit_names($row['names'] ?? '');
+        }
         if (!$names) {
             continue;
         }
-        $role = (string) get_field('credit_' . $slot . '_role', $post_id);
+        $role = isset($row['role']) ? (string) $row['role'] : 'custom';
         if ($role === '') {
             $role = 'custom';
         }
         $credits[] = array(
             'role' => $role,
-            'custom_label' => (string) get_field('credit_' . $slot . '_custom_label', $post_id),
-            'names' => $names,
-        );
-    }
-    if ($credits) {
-        return $credits;
-    }
-
-    $rows = get_field('credits', $post_id);
-    if (!is_array($rows)) {
-        return array();
-    }
-    foreach ($rows as $row) {
-        if (!is_array($row)) {
-            continue;
-        }
-        $names = silkscreen_parse_credit_names($row['names'] ?? '');
-        if (!$names) {
-            continue;
-        }
-        $credits[] = array(
-            'role' => isset($row['role']) ? (string) $row['role'] : 'custom',
-            'custom_label' => isset($row['custom_label']) ? (string) $row['custom_label'] : '',
+            'custom_label' => isset($row['custom_label']) ? trim((string) $row['custom_label']) : '',
             'names' => $names,
         );
     }
     return $credits;
+}
+
+function silkscreen_project_credits($post_id) {
+    if (!$post_id) {
+        return array();
+    }
+
+    $json = get_post_meta($post_id, SILKSCREEN_PROJECT_CREDITS_META, true);
+    if (is_string($json) && $json !== '') {
+        $rows = json_decode($json, true);
+        if (is_array($rows)) {
+            $normalized = silkscreen_normalize_credit_rows($rows);
+            if ($normalized) {
+                return $normalized;
+            }
+        }
+    }
+
+    if (function_exists('get_field')) {
+        $legacy = array();
+        for ($slot = 1; $slot <= 8; $slot++) {
+            $names_raw = (string) get_field('credit_' . $slot . '_names', $post_id);
+            $names = silkscreen_parse_credit_names($names_raw);
+            if (!$names) {
+                continue;
+            }
+            $role = (string) get_field('credit_' . $slot . '_role', $post_id);
+            if ($role === '') {
+                $role = 'custom';
+            }
+            $legacy[] = array(
+                'role' => $role,
+                'custom_label' => (string) get_field('credit_' . $slot . '_custom_label', $post_id),
+                'names' => $names,
+            );
+        }
+        if (!empty($legacy)) {
+            return $legacy;
+        }
+
+        $rows = get_field('credits', $post_id);
+        $from_repeater = silkscreen_normalize_credit_rows(is_array($rows) ? $rows : array());
+        if ($from_repeater) {
+            return $from_repeater;
+        }
+    }
+
+    return array();
 }
 
 function silkscreen_gallery($name, $post_id) {

@@ -28,7 +28,8 @@ function silkscreen_default_hero_slides() {
 }
 
 const SILKSCREEN_PROJECT_STILL_SLOTS = 5;
-const SILKSCREEN_PROJECT_CREDIT_SLOTS = 8;
+const SILKSCREEN_PROJECT_CREDITS_META = 'silkscreen_project_credits';
+const SILKSCREEN_PROJECT_STILLS_META = 'silkscreen_project_stills';
 
 const SILKSCREEN_PROJECT_POST_TYPE = 'silkscreen_project';
 const SILKSCREEN_NEWS_POST_TYPE = 'silkscreen_news';

@@ -23,97 +23,15 @@ function silkscreen_masonry_size_choices() {
     );
 }
 
-function silkscreen_project_still_fields() {
-    $fields = array(
-        array(
-            'key' => 'field_ss_project_stills_acc',
-            'label' => 'Detail stills',
-            'type' => 'accordion',
-            'open' => 1,
-            'multi_expand' => 1,
-        ),
-        array(
-            'key' => 'field_ss_project_stills_msg',
-            'type' => 'message',
-            'message' => 'Add slider images in order. Each still has an <strong>Add Image</strong> control; leave unused slots empty.',
-        ),
-    );
-    foreach (range(1, SILKSCREEN_PROJECT_STILL_SLOTS) as $slot) {
-        $fields[] = array(
-            'key' => 'field_ss_still_' . $slot,
-            'label' => sprintf('Still %d', $slot),
-            'name' => 'still_' . $slot,
-            'type' => 'image',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
-        );
-    }
-    $fields[] = array(
-        'key' => 'field_ss_project_stills_acc_end',
-        'type' => 'accordion',
-        'endpoint' => 1,
-    );
-    return $fields;
-}
-
-function silkscreen_project_credit_fields() {
-    $fields = array(
-        array(
-            'key' => 'field_ss_project_credits_acc',
-            'label' => 'Credits',
-            'type' => 'accordion',
-            'open' => 0,
-            'multi_expand' => 1,
-        ),
-        array(
-            'key' => 'field_ss_project_credits_msg',
-            'type' => 'message',
-            'message' => 'Add up to ' . SILKSCREEN_PROJECT_CREDIT_SLOTS . ' credit rows. Names can be separated by commas or line breaks. Skip empty rows.',
-        ),
-    );
-    foreach (range(1, SILKSCREEN_PROJECT_CREDIT_SLOTS) as $slot) {
-        $role_key = 'field_ss_credit_' . $slot . '_role';
-        $fields[] = array(
-            'key' => $role_key,
-            'label' => sprintf('Credit %d — role', $slot),
-            'name' => 'credit_' . $slot . '_role',
-            'type' => 'select',
-            'choices' => silkscreen_credit_role_choices(),
-            'allow_null' => 1,
-            'ui' => 0,
-        );
-        $fields[] = array(
-            'key' => 'field_ss_credit_' . $slot . '_custom',
-            'label' => sprintf('Credit %d — custom label', $slot),
-            'name' => 'credit_' . $slot . '_custom_label',
-            'type' => 'text',
-            'conditional_logic' => array(
-                array(array('field' => $role_key, 'operator' => '==', 'value' => 'custom')),
-            ),
-        );
-        $fields[] = array(
-            'key' => 'field_ss_credit_' . $slot . '_names',
-            'label' => sprintf('Credit %d — names', $slot),
-            'name' => 'credit_' . $slot . '_names',
-            'type' => 'textarea',
-            'rows' => 2,
-        );
-    }
-    $fields[] = array(
-        'key' => 'field_ss_project_credits_acc_end',
-        'type' => 'accordion',
-        'endpoint' => 1,
-    );
-    return $fields;
-}
-
 function silkscreen_project_fields() {
-    return array_merge(array(
+    return array(
         array(
             'key' => 'field_ss_project_director',
             'label' => 'Director',
             'name' => 'director',
-            'type' => 'text',
+            'type' => 'textarea',
+            'rows' => 1,
+            'new_lines' => '',
         ),
         array(
             'key' => 'field_ss_project_synopsis',
@@ -126,21 +44,17 @@ function silkscreen_project_fields() {
             'key' => 'field_ss_project_trailer',
             'label' => 'Trailer URL',
             'name' => 'trailer_url',
-            'type' => 'url',
+            'type' => 'text',
+            'instructions' => 'Full link, e.g. https://…',
+            'wrapper' => array('width' => '50'),
         ),
         array(
             'key' => 'field_ss_project_tickets',
             'label' => 'Tickets URL',
             'name' => 'tickets_url',
-            'type' => 'url',
-        ),
-        array(
-            'key' => 'field_ss_project_card_image',
-            'label' => 'List still',
-            'name' => 'card_image',
-            'type' => 'image',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
+            'type' => 'text',
+            'instructions' => 'Full link, e.g. https://…',
+            'wrapper' => array('width' => '50'),
         ),
         array(
             'key' => 'field_ss_project_poster',
@@ -149,8 +63,23 @@ function silkscreen_project_fields() {
             'type' => 'image',
             'return_format' => 'array',
             'preview_size' => 'medium',
+            'wrapper' => array('width' => '50'),
         ),
-    ), silkscreen_project_still_fields(), silkscreen_project_credit_fields());
+    );
+}
+
+function silkscreen_project_list_still_field() {
+    return array(
+        array(
+            'key' => 'field_ss_project_card_image',
+            'label' => 'List still',
+            'name' => 'card_image',
+            'type' => 'image',
+            'return_format' => 'array',
+            'preview_size' => 'medium',
+            'instructions' => 'Used on the projects index and cards.',
+        ),
+    );
 }
 
 function silkscreen_project_sidebar_fields() {
@@ -172,7 +101,7 @@ function silkscreen_project_sidebar_fields() {
     );
 }
 
-function silkscreen_news_fields() {
+function silkscreen_news_intro_fields() {
     return array(
         array(
             'key' => 'field_ss_news_kicker',
@@ -185,24 +114,13 @@ function silkscreen_news_fields() {
             'label' => 'Date label',
             'name' => 'date_label',
             'type' => 'text',
-            'instructions' => 'Display format as in design, e.g. 2.5.26',
         ),
         array(
-            'key' => 'field_ss_news_layout',
-            'label' => 'News layout',
-            'name' => 'news_layout',
-            'type' => 'select',
-            'choices' => silkscreen_news_layout_choices(),
-            'default_value' => 'caption_below',
-            'instructions' => 'Three masonry layouts: caption below, overlay on image, or compact tile.',
-        ),
-        array(
-            'key' => 'field_ss_news_size',
-            'label' => 'Masonry size',
-            'name' => 'masonry_size',
-            'type' => 'select',
-            'choices' => silkscreen_masonry_size_choices(),
-            'default_value' => 'medium',
+            'key' => 'field_ss_news_excerpt',
+            'label' => 'Excerpt (hover)',
+            'name' => 'news_excerpt',
+            'type' => 'textarea',
+            'rows' => 3,
         ),
         array(
             'key' => 'field_ss_news_image',
@@ -212,21 +130,27 @@ function silkscreen_news_fields() {
             'return_format' => 'array',
             'preview_size' => 'medium',
         ),
+    );
+}
+
+function silkscreen_news_sidebar_fields() {
+    return array(
         array(
-            'key' => 'field_ss_news_excerpt',
-            'label' => 'Excerpt (hover)',
-            'name' => 'excerpt',
-            'type' => 'textarea',
-            'rows' => 3,
+            'key' => 'field_ss_news_size',
+            'label' => 'Masonry size',
+            'name' => 'masonry_size',
+            'type' => 'select',
+            'choices' => silkscreen_masonry_size_choices(),
+            'default_value' => 'medium',
         ),
         array(
-            'key' => 'field_ss_news_project',
-            'label' => 'Linked project',
-            'name' => 'linked_project',
-            'type' => 'post_object',
-            'post_type' => array(SILKSCREEN_PROJECT_POST_TYPE),
-            'return_format' => 'object',
-            'allow_null' => 1,
+            'key' => 'field_ss_news_layout',
+            'label' => 'News layout',
+            'name' => 'news_layout',
+            'type' => 'select',
+            'choices' => silkscreen_news_layout_choices(),
+            'default_value' => 'caption_below',
+            'instructions' => 'Three masonry layouts: caption below, overlay on image, or compact tile.',
         ),
         array(
             'key' => 'field_ss_news_featured',
@@ -353,6 +277,16 @@ add_action('acf/init', function () {
     ));
 
     acf_add_local_field_group(array(
+        'key' => 'group_silkscreen_2026_project_list_still',
+        'title' => 'List still',
+        'fields' => silkscreen_project_list_still_field(),
+        'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_PROJECT_POST_TYPE))),
+        'position' => 'side',
+        'menu_order' => 5,
+        'active' => true,
+    ));
+
+    acf_add_local_field_group(array(
         'key' => 'group_silkscreen_2026_project_sidebar',
         'title' => 'Placement',
         'fields' => silkscreen_project_sidebar_fields(),
@@ -363,11 +297,21 @@ add_action('acf/init', function () {
     ));
 
     acf_add_local_field_group(array(
-        'key' => 'group_silkscreen_2026_news',
-        'title' => 'News details',
-        'fields' => silkscreen_news_fields(),
+        'key' => 'group_silkscreen_2026_news_intro',
+        'title' => 'News',
+        'fields' => silkscreen_news_intro_fields(),
         'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_NEWS_POST_TYPE))),
-        'position' => 'normal',
+        'position' => 'acf_after_title',
+        'active' => true,
+    ));
+
+    acf_add_local_field_group(array(
+        'key' => 'group_silkscreen_2026_news_sidebar',
+        'title' => 'Placement',
+        'fields' => silkscreen_news_sidebar_fields(),
+        'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_NEWS_POST_TYPE))),
+        'position' => 'side',
+        'menu_order' => 20,
         'active' => true,
     ));
 

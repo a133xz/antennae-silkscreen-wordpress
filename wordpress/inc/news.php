@@ -18,12 +18,6 @@ function silkscreen_news_from_post(WP_Post $post) {
     $id = $post->ID;
 
     $image = silkscreen_image('news_image', $id);
-    if (!$image && has_post_thumbnail($id)) {
-        $thumb = wp_get_attachment_image_src(get_post_thumbnail_id($id), 'full');
-        if ($thumb) {
-            $image = array('src' => $thumb[0], 'alt' => get_post_meta($id, '_wp_attachment_image_alt', true) ?: $post->post_title);
-        }
-    }
     if (!$image) {
         $image = array('src' => '', 'alt' => '');
     }
@@ -38,17 +32,9 @@ function silkscreen_news_from_post(WP_Post $post) {
         $size = 'small';
     }
 
-    $project_slug = '';
-    if (function_exists('get_field')) {
-        $linked = get_field('linked_project', $id);
-        if ($linked instanceof WP_Post) {
-            $project_slug = $linked->post_name;
-        } elseif (is_numeric($linked)) {
-            $linked_post = get_post((int) $linked);
-            if ($linked_post) {
-                $project_slug = $linked_post->post_name;
-            }
-        }
+    $excerpt = get_post_field('post_excerpt', $id);
+    if ($excerpt === '' && function_exists('get_field')) {
+        $excerpt = (string) get_field('excerpt', $id);
     }
 
     return array(
@@ -59,8 +45,7 @@ function silkscreen_news_from_post(WP_Post $post) {
         'image' => $image,
         'size' => $size,
         'layout' => $layout,
-        'excerpt' => has_excerpt($id) ? get_the_excerpt($id) : (function_exists('get_field') ? (string) get_field('excerpt', $id) : ''),
-        'project_slug' => $project_slug,
+        'excerpt' => $excerpt,
         'featured' => silkscreen_bool('featured', $id, false),
         'order' => (int) $post->menu_order,
     );
@@ -82,6 +67,27 @@ function silkscreen_news_query($args = array()) {
     wp_reset_postdata();
     return $items;
 }
+
+add_filter('acf/load_value/name=news_excerpt', function ($value, $post_id) {
+    if (get_post_type($post_id) !== SILKSCREEN_NEWS_POST_TYPE) {
+        return $value;
+    }
+    return get_post_field('post_excerpt', $post_id);
+}, 10, 2);
+
+function silkscreen_news_sync_excerpt_to_post($value, $post_id) {
+    if (get_post_type($post_id) !== SILKSCREEN_NEWS_POST_TYPE) {
+        return $value;
+    }
+    remove_filter('acf/update_value/name=news_excerpt', 'silkscreen_news_sync_excerpt_to_post', 10);
+    wp_update_post(array(
+        'ID' => $post_id,
+        'post_excerpt' => is_string($value) ? $value : '',
+    ));
+    add_filter('acf/update_value/name=news_excerpt', 'silkscreen_news_sync_excerpt_to_post', 10, 2);
+    return null;
+}
+add_filter('acf/update_value/name=news_excerpt', 'silkscreen_news_sync_excerpt_to_post', 10, 2);
 
 function silkscreen_featured_news($limit = 3) {
     $all = silkscreen_news_query();

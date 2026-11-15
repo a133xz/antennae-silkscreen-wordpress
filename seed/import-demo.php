@@ -220,8 +220,8 @@ foreach ($data['projects'] as $row) {
             $still_ids[] = $sid;
         }
     }
-    foreach ($still_ids as $index => $attachment_id) {
-        update_field('still_' . ($index + 1), $attachment_id, $post_id);
+    if ($still_ids) {
+        update_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, wp_json_encode($still_ids));
     }
 
     if (!empty($row['poster'])) {
@@ -232,15 +232,15 @@ foreach ($data['projects'] as $row) {
     }
 
     if (!empty($row['credits'])) {
-        foreach ($row['credits'] as $index => $credit) {
-            $slot = $index + 1;
-            if ($slot > SILKSCREEN_PROJECT_CREDIT_SLOTS) {
-                break;
-            }
-            update_field('credit_' . $slot . '_role', $credit['role'], $post_id);
-            update_field('credit_' . $slot . '_custom_label', '', $post_id);
-            update_field('credit_' . $slot . '_names', implode("\n", $credit['names']), $post_id);
+        $credit_rows = array();
+        foreach ($row['credits'] as $credit) {
+            $credit_rows[] = array(
+                'role' => $credit['role'],
+                'custom_label' => '',
+                'names' => $credit['names'],
+            );
         }
+        update_post_meta($post_id, SILKSCREEN_PROJECT_CREDITS_META, wp_json_encode($credit_rows));
     }
 }
 
@@ -265,9 +265,6 @@ foreach ($data['news'] as $row) {
     update_field('news_layout', 'caption_below', $post_id);
     update_field('masonry_size', $row['size'] ?? 'medium', $post_id);
     update_field('featured', !empty($row['featured']), $post_id);
-    if (!empty($row['excerpt'])) {
-        update_field('excerpt', $row['excerpt'], $post_id);
-    }
 
     if (!empty($row['image'])) {
         $image_id = silkscreen_seed_attach($row['image'], $row['image_alt'] ?? '');
@@ -276,9 +273,6 @@ foreach ($data['news'] as $row) {
         }
     }
 
-    if (!empty($row['project_slug']) && !empty($project_ids[$row['project_slug']])) {
-        update_field('linked_project', $project_ids[$row['project_slug']], $post_id);
-    }
 }
 
 flush_rewrite_rules(false);

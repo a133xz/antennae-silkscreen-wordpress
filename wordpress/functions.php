@@ -9,6 +9,19 @@ require get_template_directory() . '/inc/news.php';
 require get_template_directory() . '/inc/shop.php';
 require get_template_directory() . '/inc/fields.php';
 require get_template_directory() . '/inc/admin-cleanup.php';
+require get_template_directory() . '/inc/admin-project-credits.php';
+require get_template_directory() . '/inc/admin-project-stills.php';
+
+add_filter('acf/update_value', function ($value, $post_id, $field) {
+    if (!is_array($field) || !is_string($value)) {
+        return $value;
+    }
+    $text_names = array('director', 'synopsis', 'trailer_url', 'tickets_url', 'contact_intro', 'about_statement');
+    if (in_array($field['name'] ?? '', $text_names, true)) {
+        return silkscreen_sanitize_unicode_text($value);
+    }
+    return $value;
+}, 5, 3);
 
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
