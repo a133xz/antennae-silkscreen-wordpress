@@ -57,12 +57,18 @@
     apply(offset > height / 2 && hiddenRoom >= height ? height : 0, true);
   }
 
+  window.addEventListener('silkscreen-menu-scroll-restore', (event) => {
+    const y = event.detail && typeof event.detail.y === 'number' ? event.detail.y : window.scrollY;
+    lastY = y;
+    resync = true;
+    header.removeAttribute('data-header-settling');
+  });
+
   function onScroll() {
     const y = window.scrollY;
 
-    if (root.hasAttribute('data-scroll-locked')) {
+    if (root.hasAttribute('data-scroll-locked') || root.hasAttribute('data-menu-scroll-restore')) {
       resync = true;
-      apply(0);
       return;
     }
     if (resync) {
