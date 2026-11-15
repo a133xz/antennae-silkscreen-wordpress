@@ -34,10 +34,7 @@ function silkscreen_shop_get_field($name, $default = null) {
 }
 
 function silkscreen_shop_available() {
-    if (!silkscreen_shop_page_id()) {
-        return (bool) silkscreen_settings()['shop_enabled'];
-    }
-    return (bool) silkscreen_shop_get_field('shop_available', silkscreen_settings()['shop_enabled']);
+    return (bool) silkscreen_shop_get_field('shop_available', true);
 }
 
 function silkscreen_shop_url($slug = '') {

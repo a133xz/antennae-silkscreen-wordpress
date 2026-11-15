@@ -214,13 +214,6 @@ function silkscreen_news_fields() {
     );
 }
 
-function silkscreen_contact_email_sub_fields($key_prefix) {
-    return array(
-        array('key' => 'field_ss_' . $key_prefix . '_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-        array('key' => 'field_ss_' . $key_prefix . '_address', 'label' => 'Email', 'name' => 'address', 'type' => 'email'),
-    );
-}
-
 function silkscreen_contact_primary_slot_fields() {
     $fields = array();
     $defaults = silkscreen_default_contact_emails();
@@ -285,39 +278,6 @@ function silkscreen_home_fields() {
         array('key' => 'field_ss_social_handle', 'label' => 'Social handle', 'name' => 'social_handle', 'type' => 'text', 'default_value' => SILKSCREEN_SOCIAL_HANDLE),
         array('key' => 'field_ss_social_url', 'label' => 'Social URL', 'name' => 'social_url', 'type' => 'url', 'default_value' => SILKSCREEN_SOCIAL_URL),
         array('key' => 'field_ss_contact_intro', 'label' => 'Contact intro', 'name' => 'contact_intro', 'type' => 'textarea', 'rows' => 3, 'default_value' => SILKSCREEN_CONTACT_INTRO),
-        array(
-            'key' => 'field_ss_shop_enabled',
-            'label' => 'Shop enabled',
-            'name' => 'shop_enabled',
-            'type' => 'true_false',
-            'ui' => 1,
-            'default_value' => 1,
-        ),
-        array(
-            'key' => 'field_ss_posters_enabled',
-            'label' => 'Posters page enabled',
-            'name' => 'posters_enabled',
-            'type' => 'true_false',
-            'ui' => 1,
-            'default_value' => 1,
-        ),
-        array(
-            'key' => 'field_ss_hero_slides',
-            'label' => 'Hero slides',
-            'name' => 'hero_slides',
-            'type' => 'gallery',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
-        ),
-        array(
-            'key' => 'field_ss_contact_emails',
-            'label' => 'Contact emails',
-            'name' => 'contact_emails',
-            'type' => 'repeater',
-            'layout' => 'table',
-            'button_label' => 'Add email',
-            'sub_fields' => silkscreen_contact_email_sub_fields('email'),
-        ),
     );
 }
 

@@ -11,18 +11,11 @@ return array(
         'social_url' => 'https://instagram.com/silkscreen_ent',
         'statement' => 'Silkscreen is a film production company that prioritises artist-driven storytelling, cultural engagement, and bold creative expression.',
         'contact_intro' => 'If you would like to get in touch, you can reach us at the addresses below.',
-        'shop_enabled' => 1,
-        'posters_enabled' => 1,
+        'shop_available' => 1,
         'emails' => array(
             array('label' => 'General Inquiries', 'address' => 'hello@silkscreen.com'),
             array('label' => 'Press', 'address' => 'press@silkscreen.com'),
             array('label' => 'Collaborations', 'address' => 'collaborations@silkscreen.com'),
-        ),
-        'hero' => array(
-            array('file' => 'hero-1.png', 'alt' => 'Flower still from the Silkscreen reel'),
-            array('file' => 'hero-2.png', 'alt' => 'Pale blue figure from the Silkscreen reel'),
-            array('file' => 'hero-3.png', 'alt' => 'Glassware still from the Silkscreen reel'),
-            array('file' => 'hero-4.png', 'alt' => 'Caterpillar figure from the Silkscreen reel'),
         ),
     ),
     'projects' => array(

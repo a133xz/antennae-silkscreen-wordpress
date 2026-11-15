@@ -1,15 +1,12 @@
 <?php
-$settings = silkscreen_settings();
 $primary = array(
     array('href' => home_url('/projects/'), 'label' => 'Projects'),
 );
-if (!empty($settings['shop_enabled']) && silkscreen_shop_available()) {
+if (silkscreen_shop_available()) {
     $primary[] = array('href' => silkscreen_shop_url(), 'label' => 'Shop');
 }
 $primary[] = array('href' => home_url('/news/'), 'label' => 'News');
-if (!empty($settings['posters_enabled'])) {
-    $primary[] = array('href' => home_url('/posters/'), 'label' => 'Posters');
-}
+$primary[] = array('href' => home_url('/posters/'), 'label' => 'Posters');
 $secondary = array(
     array('href' => home_url('/about/'), 'label' => 'About'),
     array('href' => silkscreen_contact_url(), 'label' => 'Contact'),

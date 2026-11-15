@@ -17,5 +17,16 @@ function silkscreen_default_contact_emails() {
     );
 }
 
+function silkscreen_default_hero_slides() {
+    $hero = array();
+    foreach (array('hero-1.png', 'hero-2.png', 'hero-3.png', 'hero-4.png') as $i => $file) {
+        $hero[] = array(
+            'src' => silkscreen_asset('media/' . $file),
+            'alt' => 'Silkscreen hero still ' . ($i + 1),
+        );
+    }
+    return $hero;
+}
+
 const SILKSCREEN_PROJECT_POST_TYPE = 'silkscreen_project';
 const SILKSCREEN_NEWS_POST_TYPE = 'silkscreen_news';

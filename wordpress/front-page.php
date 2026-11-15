@@ -3,7 +3,7 @@ $ss_theme = 'light';
 $settings = silkscreen_settings();
 $projects = silkscreen_featured_projects(2);
 $news = silkscreen_featured_news(3);
-$products = ($settings['shop_enabled'] && silkscreen_shop_available()) ? silkscreen_featured_products(3) : array();
+$products = silkscreen_shop_available() ? silkscreen_featured_products(3) : array();
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
 <div class="ss-shell ss-shell--home" data-theme="light">

@@ -1,23 +1,5 @@
 <?php
 
-function silkscreen_parse_contact_emails($rows) {
-    $emails = array();
-    if (!is_array($rows)) {
-        return $emails;
-    }
-    foreach ($rows as $row) {
-        if (!is_array($row)) {
-            continue;
-        }
-        $label = isset($row['label']) ? trim((string) $row['label']) : '';
-        $address = isset($row['address']) ? trim((string) $row['address']) : '';
-        if ($address !== '') {
-            $emails[] = array('label' => $label, 'address' => $address);
-        }
-    }
-    return $emails;
-}
-
 function silkscreen_contact_emails_from_post($post_id) {
     if (!$post_id || !function_exists('get_field')) {
         return array();
@@ -35,11 +17,7 @@ function silkscreen_contact_emails_from_post($post_id) {
         );
     }
 
-    if ($emails) {
-        return $emails;
-    }
-
-    return silkscreen_parse_contact_emails(get_field('contact_emails', $post_id));
+    return $emails;
 }
 
 function silkscreen_settings() {
@@ -50,22 +28,9 @@ function silkscreen_settings() {
 
     $front_id = silkscreen_front_id();
 
-    $emails = silkscreen_contact_emails_from_post($front_id);
+    $emails = silkscreen_contact_emails_from_post(silkscreen_contact_page_id());
     if (!$emails) {
         $emails = silkscreen_default_contact_emails();
-    }
-
-    $hero = array();
-    $slides = $front_id ? silkscreen_gallery('hero_slides', $front_id) : array();
-    if ($slides) {
-        $hero = $slides;
-    } else {
-        foreach (array('hero-1.png', 'hero-2.png', 'hero-3.png', 'hero-4.png') as $i => $file) {
-            $hero[] = array(
-                'src' => silkscreen_asset('media/' . $file),
-                'alt' => 'Silkscreen hero still ' . ($i + 1),
-            );
-        }
     }
 
     $settings = array(
@@ -76,9 +41,7 @@ function silkscreen_settings() {
         'statement' => silkscreen_text('statement', $front_id, SILKSCREEN_STATEMENT),
         'contact_intro' => silkscreen_text('contact_intro', $front_id, SILKSCREEN_CONTACT_INTRO),
         'emails' => $emails,
-        'shop_enabled' => silkscreen_bool('shop_enabled', $front_id, true),
-        'posters_enabled' => silkscreen_bool('posters_enabled', $front_id, true),
-        'hero' => $hero,
+        'hero' => silkscreen_default_hero_slides(),
     );
 
     return $settings;

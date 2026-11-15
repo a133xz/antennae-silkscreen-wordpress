@@ -170,22 +170,8 @@ update_field('copyright', $s['copyright'], $home_id);
 update_field('social_handle', $s['social_handle'], $home_id);
 update_field('social_url', $s['social_url'], $home_id);
 update_field('contact_intro', $s['contact_intro'], $home_id);
-update_field('shop_enabled', (bool) $s['shop_enabled'], $home_id);
-update_field('posters_enabled', (bool) $s['posters_enabled'], $home_id);
-update_field('contact_emails', $s['emails'], $home_id);
 
-$hero_ids = array();
-foreach ($s['hero'] as $slide) {
-    $id = silkscreen_seed_attach($slide['file'], $slide['alt']);
-    if ($id) {
-        $hero_ids[] = $id;
-    }
-}
-if ($hero_ids) {
-    update_field('hero_slides', $hero_ids, $home_id);
-}
-
-update_field('shop_available', true, $shop_id);
+update_field('shop_available', (bool) $s['shop_available'], $shop_id);
 foreach ($data['products'] as $i => $product) {
     $slot = $i + 1;
     $prefix = 'shop_product_' . $slot . '_';

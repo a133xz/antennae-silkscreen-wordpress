@@ -2,14 +2,6 @@
 /**
  * Template Name: Posters Page
  */
-$settings = silkscreen_settings();
-if (empty($settings['posters_enabled'])) {
-    global $wp_query;
-    $wp_query->set_404();
-    status_header(404);
-    require get_template_directory() . '/404.php';
-    return;
-}
 $posters = silkscreen_poster_projects();
 $ss_theme = 'inverse';
 require get_template_directory() . '/template-parts/document-open.php';
