@@ -214,10 +214,12 @@ body.silkscreen-theme a:visited {
 
 }
 
-[data-site-header].ss-header--after-hero {
-  position: relative;
-  transform: none;
-  background: var(--paper);
+@media (min-width: 1300px) {
+  [data-site-header].ss-header--after-hero {
+    position: relative;
+    transform: none;
+    background: var(--paper);
+  }
 }
 
 @media (max-width: 1299px) {
@@ -242,6 +244,8 @@ body.silkscreen-theme a:visited {
   [data-site-header].ss-header--after-hero {
     position: sticky;
     top: 0;
+    z-index: 50;
+    background: var(--paper);
   }
 
   [data-site-header][data-static-mobile-header] {
@@ -1540,70 +1544,18 @@ html[data-about-active] .ss-about-content {
   background: transparent;
 }
 
-.ss-main--about {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  min-height: 0;
-}
-
-.ss-about-stage {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-}
-
-html[data-about-active] .ss-shell__viewport {
-  min-height: 100svh;
-}
-
+.ss-main--about,
 .ss-main--contact {
   display: flex;
   flex: 1;
   flex-direction: column;
   align-items: stretch;
   width: 100%;
+  min-height: 0;
 }
 
-@media (max-width: 767px) {
-  html[data-about-active] .ss-about-stage {
-    flex: 1 1 auto;
-    min-height: calc(100svh + 8rem);
-    justify-content: center;
-  }
-
-  .ss-about-stage {
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-  }
-
-  .ss-page-content--about {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 0;
-  }
-
-  .ss-about-statement-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .ss-about-statement {
-    width: 100%;
-    text-wrap: balance;
-  }
+html[data-about-active] .ss-shell__viewport {
+  min-height: 100svh;
 }
 
 .ss-page-content--about,
@@ -1642,6 +1594,7 @@ html[data-about-active] .ss-shell__viewport {
   font-weight: 400;
   letter-spacing: -0.03em;
   line-height: 1.4;
+  text-wrap: balance;
 }
 
 [data-about-layer][data-moving] {
