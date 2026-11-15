@@ -78,19 +78,6 @@ function silkscreen_about_statement($page_id = 0) {
     return SILKSCREEN_STATEMENT;
 }
 
-function silkscreen_tagline($page_id = 0) {
-    if (!$page_id) {
-        $page_id = silkscreen_about_page_id();
-    }
-    if ($page_id) {
-        $on_page = silkscreen_text('tagline', $page_id, '');
-        if ($on_page !== '') {
-            return $on_page;
-        }
-    }
-    return SILKSCREEN_TAGLINE;
-}
-
 function silkscreen_contact_page_id() {
     static $page_id = null;
     if ($page_id !== null) {

@@ -157,7 +157,6 @@ update_option('show_on_front', 'page');
 update_option('page_on_front', $home_id);
 
 $s = $data['settings'];
-update_field('tagline', $s['tagline'], $about_id);
 update_field('about_statement', $s['statement'], $about_id);
 update_field('contact_intro', $s['contact_intro'], $contact_id);
 foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {

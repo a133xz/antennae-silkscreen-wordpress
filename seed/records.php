@@ -5,7 +5,6 @@
 
 return array(
     'settings' => array(
-        'tagline' => 'Film production company based in London, UK',
         'copyright' => '©silkscreen 2026',
         'social_handle' => '@silkscreen_ent',
         'social_url' => 'https://instagram.com/silkscreen_ent',

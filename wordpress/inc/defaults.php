@@ -1,7 +1,6 @@
 <?php
 
 const SILKSCREEN_STATEMENT = 'Silkscreen is a film production company that prioritises artist-driven storytelling, cultural engagement, and bold creative expression.';
-const SILKSCREEN_TAGLINE = 'Film production company based in London, UK';
 const SILKSCREEN_COPYRIGHT = '©silkscreen 2026';
 const SILKSCREEN_SOCIAL_HANDLE = '@silkscreen_ent';
 const SILKSCREEN_SOCIAL_URL = 'https://instagram.com/silkscreen_ent';

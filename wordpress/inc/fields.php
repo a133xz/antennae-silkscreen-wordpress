@@ -260,13 +260,6 @@ function silkscreen_contact_fields() {
 function silkscreen_about_fields() {
     return array(
         array(
-            'key' => 'field_ss_about_tagline',
-            'label' => 'Tagline',
-            'name' => 'tagline',
-            'type' => 'text',
-            'default_value' => SILKSCREEN_TAGLINE,
-        ),
-        array(
             'key' => 'field_ss_about_statement',
             'label' => 'About statement',
             'name' => 'about_statement',
@@ -410,14 +403,4 @@ add_filter('acf/load_value/name=about_statement', function ($value, $post_id, $f
         return $value;
     }
     return SILKSCREEN_STATEMENT;
-}, 10, 3);
-
-add_filter('acf/load_value/name=tagline', function ($value, $post_id, $field) {
-    if ($value !== null && $value !== '') {
-        return $value;
-    }
-    if (get_post_meta($post_id, '_wp_page_template', true) !== 'page-about.php') {
-        return $value;
-    }
-    return SILKSCREEN_TAGLINE;
 }, 10, 3);
