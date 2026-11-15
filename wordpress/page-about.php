@@ -7,8 +7,8 @@ $ss_theme_color = '#ffffff';
 $about_statement = silkscreen_about_statement();
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
-<div id="ss-about-layer" data-about-layer aria-hidden="true"></div>
 <div class="ss-shell ss-about-content" data-theme="accent">
+    <div id="ss-about-layer" data-about-layer aria-hidden="true"></div>
     <div class="ss-shell__viewport">
     <?php
     $ss_static_mobile_header = true;

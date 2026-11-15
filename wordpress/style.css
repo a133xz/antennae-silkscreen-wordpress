@@ -1545,7 +1545,7 @@ html[data-about-active] [data-header-fill] {
 
 /* About */
 [data-about-layer] {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
@@ -1561,7 +1561,13 @@ html:has([data-about-layer]) body {
 }
 
 .ss-about-content.ss-shell {
-  background-color: transparent;
+  background-color: transparent !important;
+}
+
+.ss-about-content > .ss-shell__viewport,
+.ss-about-content > .ss-footer {
+  position: relative;
+  z-index: 1;
 }
 
 html[data-about-active] .ss-about-content {
