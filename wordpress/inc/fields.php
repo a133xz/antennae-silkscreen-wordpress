@@ -253,6 +253,40 @@ function silkscreen_shop_fields_layout() {
     return $fields;
 }
 
+/**
+ * Old installs synced a DB field group titled "Home page" (often on all pages). Theme uses local "Site settings".
+ */
+function silkscreen_acf_remove_legacy_field_groups() {
+    if (!function_exists('acf_get_field_groups') || !function_exists('acf_delete_field_group')) {
+        return;
+    }
+    foreach (acf_get_field_groups() as $group) {
+        if (($group['title'] ?? '') !== 'Home page') {
+            continue;
+        }
+        if (($group['key'] ?? '') === 'group_silkscreen_2026_site') {
+            continue;
+        }
+        if (function_exists('acf_is_local_field_group') && acf_is_local_field_group($group['key'] ?? '')) {
+            continue;
+        }
+        $id = (int) ($group['ID'] ?? 0);
+        if ($id > 0) {
+            acf_delete_field_group($id);
+        }
+    }
+}
+
+add_filter('acf/load_field_group', function ($field_group) {
+    if (!is_array($field_group)) {
+        return $field_group;
+    }
+    if (($field_group['title'] ?? '') === 'Home page' && ($field_group['key'] ?? '') !== 'group_silkscreen_2026_site') {
+        $field_group['active'] = false;
+    }
+    return $field_group;
+});
+
 add_action('acf/init', function () {
     if (!function_exists('acf_add_local_field_group')) {
         return;
@@ -339,7 +373,9 @@ add_action('acf/init', function () {
         'position' => 'acf_after_title',
         'active' => true,
     ));
-});
+}, 10);
+
+add_action('acf/init', 'silkscreen_acf_remove_legacy_field_groups', 100);
 
 add_filter('acf/load_value/name=contact_intro', function ($value, $post_id, $field) {
     if ($value !== null && $value !== '') {
