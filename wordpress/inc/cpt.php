@@ -19,7 +19,7 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-video-alt3',
         'has_archive' => 'projects',
         'rewrite' => array('slug' => 'projects', 'with_front' => false),
-        'supports' => array('title', 'thumbnail', 'page-attributes'),
+        'supports' => array('title', 'page-attributes'),
         'show_in_rest' => false,
     ));
 
@@ -49,7 +49,6 @@ add_action('init', function () {
 add_filter('manage_' . SILKSCREEN_PROJECT_POST_TYPE . '_posts_columns', function ($columns) {
     $columns['ss_director'] = 'Director';
     $columns['ss_featured'] = 'Featured';
-    $columns['ss_listed'] = 'On projects index';
     return $columns;
 });
 
@@ -59,10 +58,6 @@ add_action('manage_' . SILKSCREEN_PROJECT_POST_TYPE . '_posts_custom_column', fu
     }
     if ($column === 'ss_featured') {
         echo function_exists('get_field') && get_field('featured', $post_id) ? 'Yes' : '—';
-    }
-    if ($column === 'ss_listed') {
-        $listed = function_exists('get_field') ? get_field('listed', $post_id) : true;
-        echo $listed === false ? '—' : 'Yes';
     }
 }, 10, 2);
 

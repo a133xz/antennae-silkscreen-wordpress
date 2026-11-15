@@ -1,16 +1,23 @@
 <?php
 
+/**
+ * Projects index: all full titles by default. Poster-page-only entries stay off the scroll.
+ */
+function silkscreen_project_on_projects_index($on_posters, $synopsis, $featured, $stills_count) {
+    if (!$on_posters) {
+        return true;
+    }
+    if ($synopsis !== '' || $featured) {
+        return true;
+    }
+    return $stills_count > 1;
+}
+
 function silkscreen_project_from_post(WP_Post $post) {
     $id = $post->ID;
     $slug = $post->post_name;
 
     $image = silkscreen_image('card_image', $id);
-    if (!$image && has_post_thumbnail($id)) {
-        $thumb = wp_get_attachment_image_src(get_post_thumbnail_id($id), 'full');
-        if ($thumb) {
-            $image = array('src' => $thumb[0], 'alt' => get_post_meta($id, '_wp_attachment_image_alt', true) ?: $post->post_title);
-        }
-    }
 
     $stills = silkscreen_gallery('stills', $id);
     if (!$stills && $image) {
@@ -38,29 +45,27 @@ function silkscreen_project_from_post(WP_Post $post) {
         }
     }
 
-    $listed = function_exists('get_field') ? get_field('listed', $id) : true;
-    if ($listed === null || $listed === '') {
-        $listed = true;
-    }
+    $on_posters = silkscreen_bool('on_posters', $id, false);
+    $synopsis = function_exists('get_field') ? (string) get_field('synopsis', $id) : '';
+    $featured = silkscreen_bool('featured', $id, false);
+    $stills_count = count($stills);
 
     return array(
         'id' => $id,
         'title' => $post->post_title,
         'slug' => $slug,
-        'synopsis' => function_exists('get_field') ? (string) get_field('synopsis', $id) : '',
+        'synopsis' => $synopsis,
         'director' => function_exists('get_field') ? (string) get_field('director', $id) : '',
         'image' => $image,
         'stills' => $stills,
         'poster' => $poster,
-        'trailer_url' => function_exists('get_field') ? (string) get_field('trailer_url', $id) : '',
-        'tickets_url' => function_exists('get_field') ? (string) get_field('tickets_url', $id) : '',
+        'trailer_url' => trim(function_exists('get_field') ? (string) get_field('trailer_url', $id) : ''),
+        'tickets_url' => trim(function_exists('get_field') ? (string) get_field('tickets_url', $id) : ''),
         'credits' => $credits,
-        'status' => function_exists('get_field') ? (string) get_field('status', $id) : 'released',
-        'featured' => silkscreen_bool('featured', $id, false),
+        'featured' => $featured,
         'order' => (int) $post->menu_order,
-        'detail_theme' => function_exists('get_field') ? (string) get_field('detail_theme', $id) : 'light',
-        'listed' => (bool) $listed,
-        'on_posters' => silkscreen_bool('on_posters', $id, false),
+        'listed' => silkscreen_project_on_projects_index($on_posters, $synopsis, $featured, $stills_count),
+        'on_posters' => $on_posters,
         'permalink' => get_permalink($id),
     );
 }

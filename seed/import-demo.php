@@ -200,17 +200,13 @@ foreach ($data['projects'] as $row) {
 
     update_field('director', $row['director'] ?? '', $post_id);
     update_field('synopsis', $row['synopsis'] ?? '', $post_id);
-    update_field('status', 'released', $post_id);
-    update_field('detail_theme', 'light', $post_id);
     update_field('featured', !empty($row['featured']), $post_id);
-    update_field('listed', array_key_exists('listed', $row) ? (bool) $row['listed'] : true, $post_id);
     update_field('on_posters', !empty($row['on_posters']), $post_id);
 
     if (!empty($row['image'])) {
         $card_id = silkscreen_seed_attach($row['image'], $row['image_alt'] ?? $row['title']);
         if ($card_id) {
             update_field('card_image', $card_id, $post_id);
-            set_post_thumbnail($post_id, $card_id);
         }
     }
 

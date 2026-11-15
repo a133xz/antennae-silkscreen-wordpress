@@ -5,7 +5,7 @@ if (!$post) {
     exit;
 }
 $project = silkscreen_project_from_post($post);
-$ss_theme = $project['detail_theme'] === 'accent' ? 'light' : $project['detail_theme'];
+$ss_theme = 'light';
 $sparse = silkscreen_project_is_sparse($project);
 $synopsis = silkscreen_project_detail_synopsis($project);
 $stills = silkscreen_project_detail_stills($project);
@@ -13,7 +13,13 @@ $credits = silkscreen_project_detail_credits($project);
 $poster = $project['poster'] ?: $project['image'];
 $trailer = $project['trailer_url'];
 $tickets = $project['tickets_url'];
-$show_actions = $trailer !== '' || $tickets !== '' || $synopsis !== '' || $sparse;
+$project_actions = array();
+if ($trailer !== '') {
+    $project_actions[] = array('href' => $trailer, 'label' => 'Watch trailer');
+}
+if ($tickets !== '') {
+    $project_actions[] = array('href' => $tickets, 'label' => 'Book tickets');
+}
 require get_template_directory() . '/template-parts/document-open.php';
 ?>
 <div class="ss-shell" data-theme="<?php echo esc_attr($ss_theme); ?>">
@@ -28,29 +34,15 @@ require get_template_directory() . '/template-parts/document-open.php';
                         <p class="ss-project-synopsis font-serif type-heading-fluid"><?php echo esc_html($synopsis); ?></p>
                     <?php endif; ?>
                 </header>
-                <?php if ($show_actions) : ?>
+                <?php if ($project_actions) : ?>
                     <div class="ss-project-actions">
                         <span class="ss-project-actions__spacer" aria-hidden="true"></span>
                         <div class="ss-project-actions__row">
-                            <?php
-                            $actions = array(
-                                array('href' => $trailer, 'label' => 'Watch trailer'),
-                                array('href' => $tickets, 'label' => 'Book tickets'),
-                            );
-                            $label_only = $trailer === '' && $tickets === '';
-                            foreach ($actions as $action) :
-                                if ($action['href'] === '' && !$label_only) {
-                                    continue;
-                                }
-                                $external = $action['href'] !== '' && preg_match('#^https?://#', $action['href']);
-                                if ($action['href'] === '') :
-                                    ?>
-                                    <span class="ss-project-action"><?php echo esc_html($action['label']); ?><span aria-hidden="true">&gt;</span></span>
-                                <?php else : ?>
-                                    <a class="ss-project-action" href="<?php echo esc_url($action['href']); ?>"<?php echo $external ? ' target="_blank" rel="noreferrer"' : ''; ?>><?php echo esc_html($action['label']); ?><span aria-hidden="true">&gt;</span></a>
-                                <?php endif;
-                            endforeach;
-                            ?>
+                            <?php foreach ($project_actions as $action) :
+                                $external = preg_match('#^https?://#', $action['href']);
+                                ?>
+                                <a class="ss-project-action" href="<?php echo esc_url($action['href']); ?>"<?php echo $external ? ' target="_blank" rel="noreferrer"' : ''; ?>><?php echo esc_html($action['label']); ?><span aria-hidden="true">&gt;</span></a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 <?php endif; ?>
