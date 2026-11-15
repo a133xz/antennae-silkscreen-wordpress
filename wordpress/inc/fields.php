@@ -39,20 +39,6 @@ function silkscreen_project_fields() {
             'rows' => 4,
         ),
         array(
-            'key' => 'field_ss_project_featured',
-            'label' => 'Featured on home',
-            'name' => 'featured',
-            'type' => 'true_false',
-            'ui' => 1,
-        ),
-        array(
-            'key' => 'field_ss_project_on_posters',
-            'label' => 'Show on posters page',
-            'name' => 'on_posters',
-            'type' => 'true_false',
-            'ui' => 1,
-        ),
-        array(
             'key' => 'field_ss_project_card_image',
             'label' => 'List still',
             'name' => 'card_image',
@@ -120,6 +106,25 @@ function silkscreen_project_fields() {
                     'rows' => 2,
                 ),
             ),
+        ),
+    );
+}
+
+function silkscreen_project_sidebar_fields() {
+    return array(
+        array(
+            'key' => 'field_ss_project_featured',
+            'label' => 'Featured on home',
+            'name' => 'featured',
+            'type' => 'true_false',
+            'ui' => 1,
+        ),
+        array(
+            'key' => 'field_ss_project_on_posters',
+            'label' => 'Show on posters page',
+            'name' => 'on_posters',
+            'type' => 'true_false',
+            'ui' => 1,
         ),
     );
 }
@@ -301,6 +306,16 @@ add_action('acf/init', function () {
         'fields' => silkscreen_project_fields(),
         'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_PROJECT_POST_TYPE))),
         'position' => 'normal',
+        'active' => true,
+    ));
+
+    acf_add_local_field_group(array(
+        'key' => 'group_silkscreen_2026_project_sidebar',
+        'title' => 'Placement',
+        'fields' => silkscreen_project_sidebar_fields(),
+        'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_PROJECT_POST_TYPE))),
+        'position' => 'side',
+        'menu_order' => 20,
         'active' => true,
     ));
 
