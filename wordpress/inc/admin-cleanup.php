@@ -121,24 +121,28 @@ add_action('admin_head', function () {
 });
 
 /**
- * Keep the Placement meta box directly above Post attributes (menu order).
+ * @param array<string, mixed>|false $order Saved screen order from user meta.
+ * @param list<string>               $preferred_side Box IDs in order (after Publish).
  */
-add_action('do_meta_boxes', function ($post_type, $context = null) {
-    if ($context !== 'side') {
-        return;
+function silkscreen_merge_side_meta_box_order($order, array $preferred_side) {
+    if (!is_array($order)) {
+        $order = array('side' => '', 'normal' => '', 'advanced' => '');
     }
+    $existing = array();
+    if (!empty($order['side']) && is_string($order['side'])) {
+        $existing = array_filter(array_map('trim', explode(',', $order['side'])));
+    }
+    $tail = array_values(array_diff($existing, $preferred_side));
+    $order['side'] = implode(',', array_merge($preferred_side, $tail));
+    return $order;
+}
 
-    $placement_boxes = array();
-    if ($post_type === SILKSCREEN_PROJECT_POST_TYPE) {
-        $placement_boxes[] = 'acf-group_silkscreen_2026_project_sidebar';
-    }
-    if ($post_type === SILKSCREEN_NEWS_POST_TYPE) {
-        $placement_boxes[] = 'acf-group_silkscreen_2026_news_sidebar';
-    }
-    if (!$placement_boxes) {
-        return;
-    }
-
+/**
+ * Move sidebar boxes into the high stack immediately below Publish.
+ *
+ * @param list<string> $box_ids_ordered
+ */
+function silkscreen_pin_side_meta_boxes_below_publish($post_type, array $box_ids_ordered) {
     global $wp_meta_boxes;
     if (empty($wp_meta_boxes[$post_type]['side']) || !is_array($wp_meta_boxes[$post_type]['side'])) {
         return;
@@ -146,46 +150,91 @@ add_action('do_meta_boxes', function ($post_type, $context = null) {
 
     $side = &$wp_meta_boxes[$post_type]['side'];
     $priorities = array('high', 'sorted', 'core', 'default', 'low');
+    $collected = array();
 
-    foreach ($placement_boxes as $box_id) {
-        $box = null;
-        $from_priority = null;
+    foreach ($box_ids_ordered as $box_id) {
         foreach ($priorities as $priority) {
             if (empty($side[$priority][$box_id])) {
                 continue;
             }
-            $box = $side[$priority][$box_id];
-            $from_priority = $priority;
+            $collected[$box_id] = $side[$priority][$box_id];
             unset($side[$priority][$box_id]);
+            if (isset($side[$priority]) && $side[$priority] === array()) {
+                unset($side[$priority]);
+            }
             break;
         }
-        if (!$box) {
-            continue;
-        }
+    }
+    if (!$collected) {
+        return;
+    }
 
-        if (!isset($side['core']) || !is_array($side['core'])) {
-            $side['core'] = array();
-        }
+    if (!isset($side['high']) || !is_array($side['high'])) {
+        $side['high'] = array();
+    }
 
-        $reordered = array();
-        $inserted = false;
-        foreach ($side['core'] as $id => $meta_box) {
-            if ($id === 'pageparentdiv' && !$inserted) {
-                $reordered[$box_id] = $box;
-                $inserted = true;
+    $high = $side['high'];
+    $new_high = array();
+    $inserted = false;
+
+    foreach ($high as $id => $box) {
+        $new_high[$id] = $box;
+        if ($id === 'submitdiv' && !$inserted) {
+            foreach ($collected as $box_id => $box_def) {
+                $new_high[$box_id] = $box_def;
             }
-            $reordered[$id] = $meta_box;
-        }
-        if (!$inserted) {
-            $reordered[$box_id] = $box;
-        }
-        $side['core'] = $reordered;
-
-        if ($from_priority && $from_priority !== 'core' && isset($side[$from_priority]) && $side[$from_priority] === array()) {
-            unset($side[$from_priority]);
+            $inserted = true;
         }
     }
-}, 100, 2);
+
+    if (!$inserted) {
+        foreach ($collected as $box_id => $box_def) {
+            $new_high[$box_id] = $box_def;
+        }
+    }
+
+    $side['high'] = $new_high;
+}
+
+function silkscreen_project_side_meta_boxes() {
+    return array(
+        'submitdiv',
+        'acf-group_silkscreen_2026_project_sidebar',
+        'acf-group_silkscreen_2026_project_list_still',
+    );
+}
+
+function silkscreen_news_side_meta_boxes() {
+    return array(
+        'submitdiv',
+        'acf-group_silkscreen_2026_news_sidebar',
+    );
+}
+
+add_filter('get_user_option_meta-box-order_' . SILKSCREEN_PROJECT_POST_TYPE, function ($order) {
+    return silkscreen_merge_side_meta_box_order($order, silkscreen_project_side_meta_boxes());
+});
+
+add_filter('get_user_option_meta-box-order_' . SILKSCREEN_NEWS_POST_TYPE, function ($order) {
+    return silkscreen_merge_side_meta_box_order($order, silkscreen_news_side_meta_boxes());
+});
+
+add_action('do_meta_boxes', function ($post_type, $context = null) {
+    if ($context !== 'side') {
+        return;
+    }
+    if ($post_type === SILKSCREEN_PROJECT_POST_TYPE) {
+        silkscreen_pin_side_meta_boxes_below_publish($post_type, array(
+            'acf-group_silkscreen_2026_project_sidebar',
+            'acf-group_silkscreen_2026_project_list_still',
+        ));
+    }
+    if ($post_type === SILKSCREEN_NEWS_POST_TYPE) {
+        silkscreen_pin_side_meta_boxes_below_publish($post_type, array(
+            'acf-group_silkscreen_2026_news_sidebar',
+        ));
+    }
+}, 999, 2);
 
 add_filter('comments_open', '__return_false', 20, 2);
 add_filter('pings_open', '__return_false', 20, 2);
