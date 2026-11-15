@@ -61,17 +61,28 @@ add_filter('template_include', function ($template) {
     if (get_query_var('silkscreen_shop')) {
         return get_template_directory() . '/page-shop.php';
     }
-    if (is_page() && !is_front_page()) {
-        $slug = get_post_field('post_name', get_queried_object_id());
-        $map = array(
-            'about' => 'page-about.php',
-            'contact' => 'page-contact.php',
-            'posters' => 'page-posters.php',
-        );
-        if (isset($map[$slug]) && str_ends_with($template, 'front-page.php')) {
-            return get_template_directory() . '/' . $map[$slug];
+
+    // Never use the home layout template except on the real front page (guards bad hierarchy + old index.php).
+    if (str_ends_with($template, 'front-page.php') && !is_front_page()) {
+        if (is_singular('page')) {
+            $slug = get_post_field('post_name', get_queried_object_id());
+            $map = array(
+                'about' => 'page-about.php',
+                'contact' => 'page-contact.php',
+                'posters' => 'page-posters.php',
+            );
+            if (isset($map[$slug])) {
+                return get_template_directory() . '/' . $map[$slug];
+            }
+            $slug_template = get_template_directory() . '/page-' . $slug . '.php';
+            if (is_readable($slug_template)) {
+                return $slug_template;
+            }
+            return get_template_directory() . '/page.php';
         }
+        return get_template_directory() . '/404.php';
     }
+
     return $template;
 });
 

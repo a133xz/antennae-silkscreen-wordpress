@@ -84,6 +84,23 @@ function silkscreen_seed_page_slugs() {
     return array('home', 'about', 'contact', 'posters', 'shop-settings');
 }
 
+/** Pre–Silkscreen 2026 pages on Krystal that should not stay published. */
+function silkscreen_seed_legacy_page_slugs() {
+    return array('home-page');
+}
+
+function silkscreen_seed_prune_legacy_pages(callable $log) {
+    $front_id = (int) get_option('page_on_front');
+    foreach (silkscreen_seed_legacy_page_slugs() as $slug) {
+        $page = get_page_by_path($slug, OBJECT, 'page');
+        if (!$page || (int) $page->ID === $front_id) {
+            continue;
+        }
+        wp_delete_post((int) $page->ID, true);
+        $log("  Removed legacy page /{$slug}/ (ID {$page->ID})");
+    }
+}
+
 function silkscreen_seed_prune_duplicate_pages(callable $log) {
     foreach (silkscreen_seed_page_slugs() as $slug) {
         $pages = get_posts(array(
@@ -165,6 +182,8 @@ function silkscreen_import_demo_data(array $options = array()) {
         silkscreen_seed_purge();
         silkscreen_seed_prune_duplicate_pages($log);
     }
+
+    silkscreen_seed_prune_legacy_pages($log);
 
     $log('Creating pages…');
     $home_id = silkscreen_seed_page('Home', 'home');
