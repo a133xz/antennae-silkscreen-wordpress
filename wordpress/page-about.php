@@ -2,7 +2,8 @@
 /**
  * Template Name: About Page
  */
-$ss_theme = 'accent';
+$ss_theme = 'light';
+$ss_theme_color = '#ffffff';
 $about_statement = silkscreen_about_statement();
 require get_template_directory() . '/template-parts/document-open.php';
 ?>

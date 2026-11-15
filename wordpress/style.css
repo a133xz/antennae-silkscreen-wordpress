@@ -1553,9 +1553,15 @@ html[data-about-active] [data-header-fill] {
   transition: background-color 400ms ease-out;
 }
 
-html[data-about-active],
-html[data-about-active] body {
-  background: transparent;
+html:has([data-about-layer]),
+html:has([data-about-layer]) body {
+  background-color: #fff !important;
+  --canvas: #fff;
+  --paper: #fff;
+}
+
+.ss-about-content.ss-shell {
+  background-color: transparent;
 }
 
 html[data-about-active] .ss-about-content {
