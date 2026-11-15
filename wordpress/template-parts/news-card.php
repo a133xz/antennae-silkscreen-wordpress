@@ -11,7 +11,11 @@ if (!empty($args) && is_array($args)) {
 $size = isset($item['size']) ? $item['size'] : 'medium';
 list($w, $h) = silkscreen_news_frame_dimensions($size);
 $kicker = trim(strtolower($item['kicker'] ?? '') . '  ' . ($item['date_label'] ?? ''));
-$card_class = 'ss-news-card group';
+$has_excerpt = !empty($item['excerpt']);
+$card_class = 'ss-news-card';
+if ($has_excerpt) {
+    $card_class .= ' ss-news-card--has-excerpt';
+}
 if ($scroll_reveal) {
     $card_class .= ' ss-news-reveal';
 }

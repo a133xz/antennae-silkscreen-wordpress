@@ -903,31 +903,31 @@ html[data-about-active] [data-header-fill] {
   font-weight: 500;
   font-style: italic;
   line-height: 1.375;
+  pointer-events: none;
 }
 
 @media (max-width: 1023px) {
   .ss-news-card__excerpt {
-    display: block;
     opacity: 1;
   }
 }
 
 @media (min-width: 1024px) {
-  .group .ss-news-card__title {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .group .ss-news-card__excerpt {
-    display: none;
-    opacity: 1;
+  .ss-news-card--has-excerpt .ss-news-card__excerpt {
+    opacity: 0;
     transition: opacity 500ms ease-out;
   }
 
-  .group:hover .ss-news-card__excerpt,
-  .group:focus-within .ss-news-card__excerpt {
-    display: block;
+  .ss-news-card--has-excerpt:hover .ss-news-card__excerpt,
+  .ss-news-card--has-excerpt:focus-within .ss-news-card__excerpt {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-news-card--has-excerpt .ss-news-card__excerpt {
+    opacity: 1;
+    transition: none;
   }
 }
 
