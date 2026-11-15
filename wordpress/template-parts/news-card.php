@@ -27,8 +27,12 @@ if ($scroll_reveal) {
         <img src="<?php echo esc_url($item['image']['src']); ?>" alt="<?php echo esc_attr($item['image']['alt']); ?>" width="<?php echo (int) $w; ?>" height="<?php echo (int) $h; ?>" loading="lazy" />
     <?php endif; ?>
     <div class="ss-news-card__body">
-        <p class="ss-news-card__kicker"><?php echo esc_html($kicker); ?></p>
-        <<?php echo tag_escape($title_tag); ?> class="ss-news-card__title font-display"><?php echo esc_html($item['title']); ?></<?php echo tag_escape($title_tag); ?>>
+        <?php if ($kicker !== '') : ?>
+            <p class="ss-news-card__kicker"><?php echo esc_html($kicker); ?></p>
+        <?php endif; ?>
+        <?php if (!empty($item['title'])) : ?>
+            <<?php echo tag_escape($title_tag); ?> class="ss-news-card__title font-display"><?php echo esc_html($item['title']); ?></<?php echo tag_escape($title_tag); ?>>
+        <?php endif; ?>
         <?php if (!empty($item['excerpt'])) : ?>
             <p class="ss-news-card__excerpt"><?php echo esc_html($item['excerpt']); ?></p>
         <?php endif; ?>

@@ -49,9 +49,13 @@ function silkscreen_project_stills_meta_box(WP_Post $post) {
     </p>
     <div id="ss-project-stills" data-ss-stills-root>
         <ul class="ss-still-rows" data-ss-stills-rows>
-            <?php foreach ($ids as $attachment_id) : ?>
-                <?php silkscreen_project_still_row_markup($attachment_id); ?>
-            <?php endforeach; ?>
+            <?php if ($ids) : ?>
+                <?php foreach ($ids as $attachment_id) : ?>
+                    <?php silkscreen_project_still_row_markup($attachment_id); ?>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <?php silkscreen_project_still_row_markup(0); ?>
+            <?php endif; ?>
         </ul>
         <p>
             <button type="button" class="button button-secondary" data-ss-stills-add>Add still</button>

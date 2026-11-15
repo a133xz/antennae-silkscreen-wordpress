@@ -200,6 +200,53 @@ function silkscreen_project_detail_synopsis($project) {
     return '';
 }
 
+/**
+ * Project detail trailer / tickets row.
+ * null = no slot content; '' = label-only (sparse titles); non-empty = link.
+ */
+function silkscreen_project_actions_for_detail($project) {
+    $sparse = silkscreen_project_is_sparse($project);
+    $trailer = trim((string) ($project['trailer_url'] ?? ''));
+    $tickets = trim((string) ($project['tickets_url'] ?? ''));
+    $has_synopsis = trim((string) ($project['synopsis'] ?? '')) !== '';
+    $has_links = $trailer !== '' || $tickets !== '';
+
+    $trailer_url = $trailer !== '' ? $trailer : ($sparse ? '' : null);
+    $tickets_url = $tickets !== '' ? $tickets : ($sparse ? '' : null);
+
+    $show_sparse_labels = $sparse && ($trailer_url !== null || $tickets_url !== null);
+
+    return array(
+        'trailer_url' => $trailer_url,
+        'tickets_url' => $tickets_url,
+        'reserve_spacing' => $has_links || $has_synopsis || $sparse,
+        'spacing_only' => $has_synopsis && !$has_links && !$show_sparse_labels,
+    );
+}
+
+function silkscreen_project_action_slot($href, $label) {
+    if ($href === null) {
+        return '<span class="ss-project-actions__slot" aria-hidden="true"></span>';
+    }
+
+    return silkscreen_project_action_markup($href, $label);
+}
+
+function silkscreen_project_action_markup($href, $label) {
+    if ($href === null) {
+        return '';
+    }
+    $suffix = '<span aria-hidden="true">&gt;</span>';
+    $label_esc = esc_html($label);
+    if ($href === '') {
+        return '<span class="ss-project-action">' . $label_esc . $suffix . '</span>';
+    }
+    $external = (bool) preg_match('#^https?://#', $href);
+    $attrs = $external ? ' target="_blank" rel="noreferrer"' : '';
+
+    return '<a class="ss-project-action" href="' . esc_url($href) . '"' . $attrs . '>' . $label_esc . $suffix . '</a>';
+}
+
 function silkscreen_credit_label($credit) {
     $labels = array(
         'directed' => 'Directed by',

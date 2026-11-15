@@ -905,14 +905,29 @@ html[data-about-active] [data-header-fill] {
   line-height: 1.375;
 }
 
+@media (max-width: 1023px) {
+  .ss-news-card__excerpt {
+    display: block;
+    opacity: 1;
+  }
+}
+
 @media (min-width: 1024px) {
+  .group .ss-news-card__title {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+  }
+
   .group .ss-news-card__excerpt {
-    opacity: 0;
+    display: none;
+    opacity: 1;
     transition: opacity 500ms ease-out;
   }
+
   .group:hover .ss-news-card__excerpt,
   .group:focus-within .ss-news-card__excerpt {
-    opacity: 1;
+    display: block;
   }
 }
 
@@ -1647,6 +1662,14 @@ html[data-about-active] .ss-about-content {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.ss-project-actions__slot {
+  display: block;
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .ss-project-action {

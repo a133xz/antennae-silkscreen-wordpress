@@ -68,6 +68,27 @@ function silkscreen_news_query($args = array()) {
     return $items;
 }
 
+add_filter('acf/load_value/name=news_headline', function ($value, $post_id) {
+    if (get_post_type($post_id) !== SILKSCREEN_NEWS_POST_TYPE) {
+        return $value;
+    }
+    return get_post_field('post_title', $post_id);
+}, 10, 2);
+
+function silkscreen_news_sync_headline_to_post($value, $post_id) {
+    if (get_post_type($post_id) !== SILKSCREEN_NEWS_POST_TYPE) {
+        return $value;
+    }
+    remove_filter('acf/update_value/name=news_headline', 'silkscreen_news_sync_headline_to_post', 10);
+    wp_update_post(array(
+        'ID' => $post_id,
+        'post_title' => is_string($value) ? $value : '',
+    ));
+    add_filter('acf/update_value/name=news_headline', 'silkscreen_news_sync_headline_to_post', 10, 2);
+    return null;
+}
+add_filter('acf/update_value/name=news_headline', 'silkscreen_news_sync_headline_to_post', 10, 2);
+
 add_filter('acf/load_value/name=news_excerpt', function ($value, $post_id) {
     if (get_post_type($post_id) !== SILKSCREEN_NEWS_POST_TYPE) {
         return $value;

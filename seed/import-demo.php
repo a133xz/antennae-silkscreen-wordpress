@@ -183,6 +183,7 @@ foreach ($data['products'] as $i => $product) {
 
 silkscreen_seed_log('Creating projects…');
 $project_ids = array();
+$projects_missing_stills = array();
 foreach ($data['projects'] as $row) {
     $post_id = wp_insert_post(array(
         'post_title' => $row['title'],
@@ -222,6 +223,8 @@ foreach ($data['projects'] as $row) {
     }
     if ($still_ids) {
         update_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, wp_json_encode($still_ids));
+    } else {
+        $projects_missing_stills[] = $row['slug'];
     }
 
     if (!empty($row['poster'])) {
@@ -242,6 +245,10 @@ foreach ($data['projects'] as $row) {
         }
         update_post_meta($post_id, SILKSCREEN_PROJECT_CREDITS_META, wp_json_encode($credit_rows));
     }
+}
+
+if ($projects_missing_stills) {
+    silkscreen_seed_log('  ! projects with no slider stills (check wordpress/assets/media/): ' . implode(', ', $projects_missing_stills));
 }
 
 silkscreen_seed_log('Creating news…');

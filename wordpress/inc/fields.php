@@ -108,11 +108,19 @@ function silkscreen_news_intro_fields() {
             'label' => 'Kicker',
             'name' => 'kicker',
             'type' => 'text',
+            'wrapper' => array('width' => '50'),
         ),
         array(
             'key' => 'field_ss_news_date',
             'label' => 'Date label',
             'name' => 'date_label',
+            'type' => 'text',
+            'wrapper' => array('width' => '50'),
+        ),
+        array(
+            'key' => 'field_ss_news_headline',
+            'label' => 'Title',
+            'name' => 'news_headline',
             'type' => 'text',
         ),
         array(
@@ -292,7 +300,7 @@ add_action('acf/init', function () {
         'fields' => silkscreen_project_sidebar_fields(),
         'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_PROJECT_POST_TYPE))),
         'position' => 'side',
-        'menu_order' => 20,
+        'menu_order' => 0,
         'active' => true,
     ));
 
@@ -311,7 +319,7 @@ add_action('acf/init', function () {
         'fields' => silkscreen_news_sidebar_fields(),
         'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_NEWS_POST_TYPE))),
         'position' => 'side',
-        'menu_order' => 20,
+        'menu_order' => 0,
         'active' => true,
     ));
 

@@ -112,6 +112,81 @@ add_action('init', function () {
     }
 }, 100);
 
+add_action('admin_head', function () {
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    if (!$screen || $screen->post_type !== SILKSCREEN_NEWS_POST_TYPE) {
+        return;
+    }
+    echo '<style>#titlediv { display: none; }</style>';
+});
+
+/**
+ * Keep the Placement meta box directly above Post attributes (menu order).
+ */
+add_action('do_meta_boxes', function ($post_type, $context = null) {
+    if ($context !== 'side') {
+        return;
+    }
+
+    $placement_boxes = array();
+    if ($post_type === SILKSCREEN_PROJECT_POST_TYPE) {
+        $placement_boxes[] = 'acf-group_silkscreen_2026_project_sidebar';
+    }
+    if ($post_type === SILKSCREEN_NEWS_POST_TYPE) {
+        $placement_boxes[] = 'acf-group_silkscreen_2026_news_sidebar';
+    }
+    if (!$placement_boxes) {
+        return;
+    }
+
+    global $wp_meta_boxes;
+    if (empty($wp_meta_boxes[$post_type]['side']) || !is_array($wp_meta_boxes[$post_type]['side'])) {
+        return;
+    }
+
+    $side = &$wp_meta_boxes[$post_type]['side'];
+    $priorities = array('high', 'sorted', 'core', 'default', 'low');
+
+    foreach ($placement_boxes as $box_id) {
+        $box = null;
+        $from_priority = null;
+        foreach ($priorities as $priority) {
+            if (empty($side[$priority][$box_id])) {
+                continue;
+            }
+            $box = $side[$priority][$box_id];
+            $from_priority = $priority;
+            unset($side[$priority][$box_id]);
+            break;
+        }
+        if (!$box) {
+            continue;
+        }
+
+        if (!isset($side['core']) || !is_array($side['core'])) {
+            $side['core'] = array();
+        }
+
+        $reordered = array();
+        $inserted = false;
+        foreach ($side['core'] as $id => $meta_box) {
+            if ($id === 'pageparentdiv' && !$inserted) {
+                $reordered[$box_id] = $box;
+                $inserted = true;
+            }
+            $reordered[$id] = $meta_box;
+        }
+        if (!$inserted) {
+            $reordered[$box_id] = $box;
+        }
+        $side['core'] = $reordered;
+
+        if ($from_priority && $from_priority !== 'core' && isset($side[$from_priority]) && $side[$from_priority] === array()) {
+            unset($side[$from_priority]);
+        }
+    }
+}, 100, 2);
+
 add_filter('comments_open', '__return_false', 20, 2);
 add_filter('pings_open', '__return_false', 20, 2);
 add_filter('comments_array', '__return_empty_array', 10, 2);

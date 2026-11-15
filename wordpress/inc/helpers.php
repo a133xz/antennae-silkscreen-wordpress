@@ -100,7 +100,10 @@ function silkscreen_project_still_attachment_ids($post_id) {
     if (is_string($json) && $json !== '') {
         $ids = json_decode($json, true);
         if (is_array($ids)) {
-            return array_values(array_filter(array_map('intval', $ids)));
+            $ids = array_values(array_filter(array_map('intval', $ids)));
+            if ($ids) {
+                return $ids;
+            }
         }
     }
 
@@ -117,7 +120,19 @@ function silkscreen_project_still_attachment_ids($post_id) {
             $ids[] = (int) $value;
         }
     }
-    return $ids;
+    if ($ids) {
+        return $ids;
+    }
+
+    $card = get_field('card_image', $post_id);
+    if (is_array($card) && !empty($card['ID'])) {
+        return array((int) $card['ID']);
+    }
+    if (is_numeric($card) && (int) $card > 0) {
+        return array((int) $card);
+    }
+
+    return array();
 }
 
 /**
