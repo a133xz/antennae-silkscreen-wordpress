@@ -260,18 +260,7 @@ function silkscreen_contact_fields() {
                 'default_value' => SILKSCREEN_CONTACT_INTRO,
             ),
         ),
-        silkscreen_contact_primary_slot_fields(),
-        array(
-            array(
-                'key' => 'field_ss_contact_emails_extra',
-                'label' => 'Additional emails',
-                'name' => 'contact_emails_extra',
-                'type' => 'repeater',
-                'layout' => 'table',
-                'button_label' => 'Add email',
-                'sub_fields' => silkscreen_contact_email_sub_fields('contact_extra_email'),
-            ),
-        )
+        silkscreen_contact_primary_slot_fields()
     );
 }
 

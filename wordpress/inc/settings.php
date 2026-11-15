@@ -35,8 +35,6 @@ function silkscreen_contact_emails_from_post($post_id) {
         );
     }
 
-    $emails = array_merge($emails, silkscreen_parse_contact_emails(get_field('contact_emails_extra', $post_id)));
-
     if ($emails) {
         return $emails;
     }

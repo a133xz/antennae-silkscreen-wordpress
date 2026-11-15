@@ -166,7 +166,6 @@ foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
     update_field('contact_email_' . $slot . '_label', $row['label'], $contact_id);
     update_field('contact_email_' . $slot . '_address', $row['address'], $contact_id);
 }
-update_field('contact_emails_extra', array(), $contact_id);
 update_field('copyright', $s['copyright'], $home_id);
 update_field('social_handle', $s['social_handle'], $home_id);
 update_field('social_url', $s['social_url'], $home_id);
