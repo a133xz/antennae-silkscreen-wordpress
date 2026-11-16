@@ -373,10 +373,7 @@ body.silkscreen-theme a:visited {
 
 .ss-header-fill {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100svh;
+  inset: 0;
   background: var(--canvas, var(--paper));
   background-size: cover;
   background-position: center;
