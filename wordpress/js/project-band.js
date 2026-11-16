@@ -48,6 +48,9 @@
     node.style.backgroundColor = bg;
     if (footerEl) footerEl.style.backgroundColor = bg;
     if (mainEl) mainEl.style.backgroundColor = bg;
+    // Light theme pins --canvas to white on the shell, so the fixed header
+    // stayed white after --ink flipped and the logo and menu vanished.
+    shell.style.setProperty('--canvas', bg);
     document.documentElement.style.setProperty('--canvas', bg);
     document.documentElement.style.backgroundColor = bg;
     document.body.style.backgroundColor = bg;
