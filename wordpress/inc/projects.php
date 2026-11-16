@@ -201,46 +201,31 @@ function silkscreen_project_detail_synopsis($project) {
 }
 
 /**
- * Project detail trailer / tickets row.
- * null = no slot content; '' = label-only (sparse titles); non-empty = link.
+ * Project detail trailer / tickets — show only when CMS fields are non-empty.
  */
 function silkscreen_project_actions_for_detail($project) {
-    $sparse = silkscreen_project_is_sparse($project);
     $trailer = trim((string) ($project['trailer_url'] ?? ''));
     $tickets = trim((string) ($project['tickets_url'] ?? ''));
-    $has_synopsis = trim((string) ($project['synopsis'] ?? '')) !== '';
-    $has_links = $trailer !== '' || $tickets !== '';
-
-    $trailer_url = $trailer !== '' ? $trailer : ($sparse ? '' : null);
-    $tickets_url = $tickets !== '' ? $tickets : ($sparse ? '' : null);
-
-    $show_sparse_labels = $sparse && ($trailer_url !== null || $tickets_url !== null);
+    $has_trailer = $trailer !== '';
+    $has_tickets = $tickets !== '';
+    $has_links = $has_trailer || $has_tickets;
+    $shows_synopsis = silkscreen_project_detail_synopsis($project) !== '';
 
     return array(
-        'trailer_url' => $trailer_url,
-        'tickets_url' => $tickets_url,
-        'reserve_spacing' => $has_links || $has_synopsis || $sparse,
-        'spacing_only' => $has_synopsis && !$has_links && !$show_sparse_labels,
+        'trailer_url' => $has_trailer ? $trailer : null,
+        'tickets_url' => $has_tickets ? $tickets : null,
+        'reserve_spacing' => $has_links || $shows_synopsis,
+        'spacing_only' => $shows_synopsis && !$has_links,
     );
 }
 
-function silkscreen_project_action_slot($href, $label) {
-    if ($href === null) {
-        return '<span class="ss-project-actions__slot" aria-hidden="true"></span>';
-    }
-
-    return silkscreen_project_action_markup($href, $label);
-}
-
 function silkscreen_project_action_markup($href, $label) {
-    if ($href === null) {
+    $href = trim((string) $href);
+    if ($href === '') {
         return '';
     }
     $suffix = '<span aria-hidden="true">&gt;</span>';
     $label_esc = esc_html($label);
-    if ($href === '') {
-        return '<span class="ss-project-action">' . $label_esc . $suffix . '</span>';
-    }
     $external = (bool) preg_match('#^https?://#', $href);
     $attrs = $external ? ' target="_blank" rel="noreferrer"' : '';
 

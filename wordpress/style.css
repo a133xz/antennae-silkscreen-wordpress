@@ -1672,9 +1672,20 @@ html[data-about-active] .ss-shell__viewport {
   column-gap: 21px;
 }
 
+/* Synopsis present but no trailer/tickets: match title → synopsis gap on small screens */
+.ss-project-actions--spacing-only {
+  margin-top: 26px;
+  margin-bottom: 0;
+}
+
 @media (min-width: 1024px) {
   .ss-project-actions {
     grid-template-columns: minmax(0, 930fr) minmax(0, 929fr);
+  }
+
+  .ss-project-actions--spacing-only {
+    margin-top: clamp(3rem, 14vw, 16.3rem);
+    margin-bottom: 1.75rem;
   }
 }
 
@@ -1732,6 +1743,12 @@ a.ss-project-action:hover { opacity: 0.6; }
 .ss-shell:has(.ss-project-band) > .ss-footer,
 .ss-shell:has(.ss-project-band) .ss-main {
   background-color: #fff;
+}
+
+/* The fixed bar was a separate color plate. Its bottom edge read as a line
+   under the logo when the page faded. Let the page show through instead. */
+.ss-shell:has(.ss-project-band) [data-header-fill] {
+  background: transparent;
 }
 
 .ss-shell[data-project-band='dark'] {

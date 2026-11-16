@@ -35,8 +35,12 @@ require get_template_directory() . '/template-parts/document-open.php';
                         <div class="ss-project-actions__row">
                             <?php if (!$spacing_only) : ?>
                                 <?php
-                                echo silkscreen_project_action_slot($detail_actions['trailer_url'], 'Watch trailer');
-                                echo silkscreen_project_action_slot($detail_actions['tickets_url'], 'Book tickets');
+                                if ($detail_actions['trailer_url'] !== null) {
+                                    echo silkscreen_project_action_markup($detail_actions['trailer_url'], 'Watch trailer');
+                                }
+                                if ($detail_actions['tickets_url'] !== null) {
+                                    echo silkscreen_project_action_markup($detail_actions['tickets_url'], 'Book tickets');
+                                }
                                 ?>
                             <?php endif; ?>
                         </div>
