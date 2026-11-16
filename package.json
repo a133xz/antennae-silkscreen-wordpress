@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "deploy": "node scripts/push.js",
+    "deploy:legacy": "node scripts/deploy-legacy.js",
     "verify": "node scripts/verify-ftp.js",
     "seed:local": "node scripts/seed-local.js"
   },
