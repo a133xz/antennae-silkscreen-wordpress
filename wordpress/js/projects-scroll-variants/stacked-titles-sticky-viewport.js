@@ -1,6 +1,5 @@
 /**
- * Variant: stacked sticky titles (PILE_GAP 36, image-aligned pile top).
- * See projects-scroll-variants/README.md
+ * Original sticky stack without MAX_STACK lift — pile can grow in place.
  */
 (function () {
   const grid = document.querySelector('[data-projects-pile]');

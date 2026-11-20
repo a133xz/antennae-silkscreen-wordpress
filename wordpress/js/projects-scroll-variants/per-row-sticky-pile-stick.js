@@ -24,7 +24,7 @@
     });
     const first = stills[0];
     if (!first) return;
-    const line = Math.round(first.getBoundingClientRect().top + window.scrollY);
+    const line = Math.round(first.getBoundingClientRect().top);
     grid.style.setProperty('--pile-stick', line + 'px');
   };
 
