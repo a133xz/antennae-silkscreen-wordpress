@@ -1044,8 +1044,6 @@ html[data-about-active] [data-header-fill] {
 
 .ss-pile-title {
   position: sticky;
-  top: var(--pile-stick, 0px);
-  margin-bottom: 72px;
   text-decoration: none;
   color: inherit;
 }
@@ -1088,11 +1086,6 @@ html[data-about-active] [data-header-fill] {
 
 .ss-pile-title-cell {
   grid-column: 1;
-  align-self: stretch;
-}
-
-.ss-pile-title-cell--last .ss-pile-title {
-  margin-bottom: 0;
 }
 
 [data-pile-still] {
