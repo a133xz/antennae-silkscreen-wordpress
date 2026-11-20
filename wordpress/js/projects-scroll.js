@@ -1,6 +1,6 @@
 /**
  * Projects index — sticky stack (PILE_GAP 36).
- * After 4 titles are stuck, pile shifts up; last project is excluded from driving lift.
+ * After 4 titles are stuck, pile shifts up smoothly; last project does not drive lift.
  */
 (function () {
   const grid = document.querySelector('[data-projects-pile]');
@@ -19,8 +19,8 @@
 
   const pileStepAfter = (index, heights) =>
     Math.max(PILE_STEP, (heights[index] || PILE_ROW_H) + PILE_GAP);
-  const pileStickyTop = (index, heights, pileTop) => {
-    let top = pileTop;
+  const pileStickyTop = (index, heights, baseTop) => {
+    let top = baseTop;
     for (let k = 0; k < index; k += 1) top += pileStepAfter(k, heights);
     return top;
   };
@@ -32,31 +32,17 @@
 
   let pileTop = 0;
 
-  const stuckCount = () => {
-    let n = 0;
-    for (let i = 0; i < count; i += 1) {
-      if (stills[i].getBoundingClientRect().top < pileTop) n += 1;
-      else break;
-    }
-    return n;
-  };
-
+  /** Scroll-linked lift (subpixel); last still never contributes. */
   const stackLift = (heights) => {
     if (!pileTop || count <= MAX_STACK) return 0;
-    const stuck = stuckCount();
-    if (stuck <= MAX_STACK) return 0;
-
     let lift = 0;
     const lastDriver = count - 2;
-    for (let k = MAX_STACK; k < stuck && k <= lastDriver; k += 1) {
-      lift += pileStepAfter(k - 1, heights);
-    }
-    const enterIdx = stuck;
-    if (enterIdx < count - 1) {
-      const step = pileStepAfter(enterIdx - 1, heights);
-      const stillTop = stills[enterIdx].getBoundingClientRect().top;
+    for (let i = MAX_STACK; i <= lastDriver; i += 1) {
+      const step = pileStepAfter(i - 1, heights);
+      const stillTop = stills[i].getBoundingClientRect().top;
       const anchor = pileTop - lift;
-      if (stillTop < anchor) lift += Math.min(step, anchor - stillTop);
+      if (stillTop >= anchor) break;
+      lift += Math.min(step, anchor - stillTop);
     }
     return lift;
   };
@@ -67,38 +53,43 @@
     el.style.transform = '';
   });
 
-  let applied = '';
-  const apply = () => {
-    const heights = stickies.map((el) => Math.round(el.getBoundingClientRect().height));
+  let layoutSig = '';
+
+  const refreshPileTop = () => {
     const firstStill = stills[0];
-    if (window.scrollY === 0 && firstStill) {
-      const imageTop = Math.round(firstStill.getBoundingClientRect().top);
-      if (imageTop > 0) pileTop = imageTop;
-    } else if (!pileTop && firstStill) {
-      const imageTop = Math.round(firstStill.getBoundingClientRect().top);
-      if (imageTop > 0) pileTop = imageTop;
-    }
-    if (!pileTop) return;
+    if (!firstStill) return;
+    const imageTop = firstStill.getBoundingClientRect().top;
+    if (window.scrollY === 0 && imageTop > 0) pileTop = imageTop;
+    else if (!pileTop && imageTop > 0) pileTop = imageTop;
+  };
 
-    const base = pileTop - stackLift(heights);
-    const signature = `${Math.round(base)}|${heights.join(',')}`;
-    if (signature === applied) return;
-    applied = signature;
-
+  const applyLayout = (heights) => {
+    const sig = heights.join(',');
+    if (sig === layoutSig) return;
+    layoutSig = sig;
     titleCells.forEach((cell, index) => {
       cell.style.gridColumn = '1';
       cell.style.gridRow = `${index + 1} / -1`;
       cell.style.marginBottom = `${pileMarginBottom(index, heights)}px`;
       cell.style.zIndex = String(index + 1);
-      const sticky = stickies[index];
-      if (sticky) {
-        sticky.style.top = `${pileStickyTop(index, heights, base)}px`;
-        sticky.style.transform = '';
-      }
     });
     stills.forEach((still, index) => {
       still.style.gridColumn = '2';
       still.style.gridRow = String(index + 1);
+    });
+  };
+
+  const apply = () => {
+    refreshPileTop();
+    if (!pileTop) return;
+
+    const heights = stickies.map((el) => Math.round(el.getBoundingClientRect().height));
+    applyLayout(heights);
+
+    const base = pileTop - stackLift(heights);
+    stickies.forEach((sticky, index) => {
+      const top = pileStickyTop(index, heights, base);
+      sticky.style.top = `${top.toFixed(2)}px`;
     });
   };
 
@@ -110,14 +101,20 @@
 
   apply();
   schedule();
-  window.addEventListener('resize', schedule);
+  window.addEventListener('resize', () => {
+    layoutSig = '';
+    schedule();
+  });
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('load', schedule);
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(schedule);
   }
   if (typeof ResizeObserver !== 'undefined') {
-    const observer = new ResizeObserver(schedule);
+    const observer = new ResizeObserver(() => {
+      layoutSig = '';
+      schedule();
+    });
     stickies.forEach((el) => observer.observe(el));
   }
 })();
