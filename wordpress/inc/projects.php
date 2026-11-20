@@ -1,16 +1,11 @@
 <?php
 
 /**
- * Projects index: all full titles by default. Poster-page-only entries stay off the scroll.
+ * Projects page only includes films that have at least one still.
  */
 function silkscreen_project_on_projects_index($on_posters, $synopsis, $featured, $stills_count) {
-    if (!$on_posters) {
-        return true;
-    }
-    if ($synopsis !== '' || $featured) {
-        return true;
-    }
-    return $stills_count > 1;
+    unset($on_posters, $synopsis, $featured);
+    return $stills_count > 0;
 }
 
 function silkscreen_project_from_post(WP_Post $post) {
@@ -19,19 +14,21 @@ function silkscreen_project_from_post(WP_Post $post) {
 
     $image = silkscreen_image('card_image', $id);
 
-    $stills = silkscreen_project_stills($id);
+    $own_stills = silkscreen_project_stills($id);
+    $stills = $own_stills;
     if (!$stills && $image) {
         $stills = array($image);
     }
 
-    $poster = silkscreen_image('poster', $id);
+    $posters = silkscreen_project_posters($id);
+    $poster = $posters[0] ?? null;
 
     $credits = silkscreen_project_credits($id);
 
     $on_posters = silkscreen_bool('on_posters', $id, false);
     $synopsis = function_exists('get_field') ? (string) get_field('synopsis', $id) : '';
     $featured = silkscreen_bool('featured', $id, false);
-    $stills_count = count($stills);
+    $stills_count = count($own_stills);
 
     return array(
         'id' => $id,
@@ -42,6 +39,7 @@ function silkscreen_project_from_post(WP_Post $post) {
         'image' => $image,
         'stills' => $stills,
         'poster' => $poster,
+        'posters' => $posters,
         'trailer_url' => trim(function_exists('get_field') ? (string) get_field('trailer_url', $id) : ''),
         'tickets_url' => trim(function_exists('get_field') ? (string) get_field('tickets_url', $id) : ''),
         'credits' => $credits,
@@ -58,7 +56,7 @@ function silkscreen_projects_query($args = array()) {
         'post_type' => SILKSCREEN_PROJECT_POST_TYPE,
         'post_status' => 'publish',
         'posts_per_page' => -1,
-        'orderby' => 'menu_order',
+        'orderby' => 'menu_order title',
         'order' => 'ASC',
     );
     $query = new WP_Query(array_merge($defaults, $args));
@@ -85,21 +83,9 @@ function silkscreen_get_project($slug) {
 }
 
 function silkscreen_featured_projects($limit = 2) {
-    $all = silkscreen_projects_query();
-    $featured = array_values(array_filter($all, function ($p) {
+    $featured = array_values(array_filter(silkscreen_projects_query(), function ($p) {
         return !empty($p['featured']) && !empty($p['listed']);
     }));
-    if (count($featured) < $limit) {
-        foreach ($all as $p) {
-            if (count($featured) >= $limit) {
-                break;
-            }
-            if (empty($p['listed']) || in_array($p, $featured, true)) {
-                continue;
-            }
-            $featured[] = $p;
-        }
-    }
     return array_slice($featured, 0, $limit);
 }
 
@@ -113,6 +99,37 @@ function silkscreen_poster_projects() {
     return array_values(array_filter(silkscreen_projects_query(), function ($p) {
         return !empty($p['on_posters']);
     }));
+}
+
+/**
+ * One card per poster. Each card links back to its project.
+ * Saved Posters meta wins. Older projects still use the single poster when “Show on posters page” is on.
+ */
+function silkscreen_posters_page_items() {
+    $items = array();
+    foreach (silkscreen_projects_query() as $project) {
+        $saved = !empty($project['id']) && metadata_exists('post', (int) $project['id'], SILKSCREEN_PROJECT_POSTERS_META);
+        if ($saved) {
+            $posters = $project['posters'] ?? array();
+        } elseif (!empty($project['on_posters'])) {
+            $fallback = !empty($project['poster']['src']) ? $project['poster'] : ($project['image'] ?? null);
+            $posters = ($fallback && !empty($fallback['src'])) ? array($fallback) : array();
+        } else {
+            continue;
+        }
+
+        foreach ($posters as $poster) {
+            if (empty($poster['src'])) {
+                continue;
+            }
+            $items[] = array(
+                'title' => $project['title'],
+                'permalink' => $project['permalink'],
+                'poster' => $poster,
+            );
+        }
+    }
+    return $items;
 }
 
 function silkscreen_project_is_sparse($project) {
@@ -152,8 +169,19 @@ function silkscreen_project_primary_still($project) {
     return null;
 }
 
+function silkscreen_project_has_saved_stills_meta($post_id) {
+    if (!$post_id) {
+        return false;
+    }
+    return metadata_exists('post', (int) $post_id, SILKSCREEN_PROJECT_STILLS_META);
+}
+
 function silkscreen_project_detail_stills($project) {
     $own = !empty($project['stills']) ? $project['stills'] : (!empty($project['image']) ? array($project['image']) : array());
+    $post_id = !empty($project['id']) ? (int) $project['id'] : 0;
+    if ($post_id && silkscreen_project_has_saved_stills_meta($post_id)) {
+        return $own;
+    }
     if (!silkscreen_project_is_sparse($project)) {
         return $own;
     }

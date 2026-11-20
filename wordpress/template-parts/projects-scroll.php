@@ -15,12 +15,12 @@ $count = count($projects);
 </ul>
 <div class="ss-projects-pile" data-projects-pile data-count="<?php echo (int) $count; ?>">
     <?php foreach ($projects as $index => $project) : ?>
-        <div class="ss-pile-title-cell" data-pile-index="<?php echo (int) $index; ?>">
+        <div class="ss-pile-title-cell<?php echo $index === $count - 1 ? ' ss-pile-title-cell--last' : ''; ?>" data-pile-index="<?php echo (int) $index; ?>">
             <div class="ss-pile-title" data-pile-sticky>
                 <a href="<?php echo esc_url($project['permalink']); ?>" class="ss-pile-title__link">
                     <h2 class="ss-pile-title__name font-display type-heading-fluid"><?php echo esc_html($project['title']); ?></h2>
                     <?php if (!empty($project['director'])) : ?>
-                        <p class="ss-directed"><em>Directed by </em><?php echo esc_html($project['director']); ?></p>
+                        <p class="ss-directed"><em class="ss-directed__lead">Directed by</em><span class="ss-directed__name"><?php echo esc_html($project['director']); ?></span></p>
                     <?php endif; ?>
                 </a>
             </div>

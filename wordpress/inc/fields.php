@@ -57,20 +57,6 @@ function silkscreen_project_fields() {
             'wrapper' => array('width' => '50'),
         ),
         array(
-            'key' => 'field_ss_project_poster',
-            'label' => 'Poster',
-            'name' => 'poster',
-            'type' => 'image',
-            'return_format' => 'array',
-            'preview_size' => 'medium',
-            'wrapper' => array('width' => '50'),
-        ),
-    );
-}
-
-function silkscreen_project_list_still_field() {
-    return array(
-        array(
             'key' => 'field_ss_project_card_image',
             'label' => 'List still',
             'name' => 'card_image',
@@ -78,9 +64,12 @@ function silkscreen_project_list_still_field() {
             'return_format' => 'array',
             'preview_size' => 'medium',
             'instructions' => 'Used on the projects index and cards.',
+            'wrapper' => array('width' => '50'),
         ),
     );
 }
+
+add_filter('acf/prepare_field/key=field_ss_project_on_posters', '__return_false');
 
 function silkscreen_project_sidebar_fields() {
     return array(
@@ -131,6 +120,13 @@ function silkscreen_news_intro_fields() {
             'rows' => 3,
         ),
         array(
+            'key' => 'field_ss_news_url',
+            'label' => 'Link',
+            'name' => 'news_url',
+            'type' => 'url',
+            'instructions' => 'Optional. Opens when the news item is clicked.',
+        ),
+        array(
             'key' => 'field_ss_news_image',
             'label' => 'Image',
             'name' => 'news_image',
@@ -161,46 +157,30 @@ function silkscreen_news_sidebar_fields() {
     );
 }
 
-function silkscreen_contact_primary_slot_fields() {
-    $fields = array();
-    $defaults = silkscreen_default_contact_emails();
-
-    foreach (range(1, SILKSCREEN_CONTACT_PRIMARY_SLOTS) as $slot) {
-        $row = isset($defaults[$slot - 1]) ? $defaults[$slot - 1] : array('label' => '', 'address' => '');
-        $fields[] = array(
-            'key' => 'field_ss_contact_email_' . $slot . '_label',
-            'label' => sprintf('Email %d — type label', $slot),
-            'name' => 'contact_email_' . $slot . '_label',
-            'type' => 'text',
-            'default_value' => $row['label'],
-            'wrapper' => array('width' => '50'),
-        );
-        $fields[] = array(
-            'key' => 'field_ss_contact_email_' . $slot . '_address',
-            'label' => sprintf('Email %d — address', $slot),
-            'name' => 'contact_email_' . $slot . '_address',
-            'type' => 'email',
-            'default_value' => $row['address'],
-            'wrapper' => array('width' => '50'),
-        );
-    }
-
-    return $fields;
+function silkscreen_contact_fields() {
+    return array(
+        array(
+            'key' => 'field_ss_contact_page_intro',
+            'label' => 'Contact intro',
+            'name' => 'contact_intro',
+            'type' => 'textarea',
+            'rows' => 3,
+            'default_value' => SILKSCREEN_CONTACT_INTRO,
+        ),
+    );
 }
 
-function silkscreen_contact_fields() {
-    return array_merge(
+function silkscreen_posters_page_fields() {
+    return array(
         array(
-            array(
-                'key' => 'field_ss_contact_page_intro',
-                'label' => 'Contact intro',
-                'name' => 'contact_intro',
-                'type' => 'textarea',
-                'rows' => 3,
-                'default_value' => SILKSCREEN_CONTACT_INTRO,
-            ),
+            'key' => 'field_ss_posters_in_menu',
+            'label' => 'Show in menu',
+            'name' => 'posters_in_menu',
+            'type' => 'true_false',
+            'ui' => 1,
+            'default_value' => 1,
+            'instructions' => 'When off, the posters page stays at its address and is hidden from the menu.',
         ),
-        silkscreen_contact_primary_slot_fields()
     );
 }
 
@@ -310,16 +290,6 @@ add_action('acf/init', function () {
     ));
 
     acf_add_local_field_group(array(
-        'key' => 'group_silkscreen_2026_project_list_still',
-        'title' => 'List still',
-        'fields' => silkscreen_project_list_still_field(),
-        'location' => array(array(array('param' => 'post_type', 'operator' => '==', 'value' => SILKSCREEN_PROJECT_POST_TYPE))),
-        'position' => 'side',
-        'menu_order' => 5,
-        'active' => true,
-    ));
-
-    acf_add_local_field_group(array(
         'key' => 'group_silkscreen_2026_project_sidebar',
         'title' => 'Placement',
         'fields' => silkscreen_project_sidebar_fields(),
@@ -357,6 +327,15 @@ add_action('acf/init', function () {
     ));
 
     acf_add_local_field_group(array(
+        'key' => 'group_silkscreen_2026_posters',
+        'title' => 'Posters page',
+        'fields' => silkscreen_posters_page_fields(),
+        'location' => array(array(array('param' => 'page_template', 'operator' => '==', 'value' => 'page-posters.php'))),
+        'position' => 'acf_after_title',
+        'active' => true,
+    ));
+
+    acf_add_local_field_group(array(
         'key' => 'group_silkscreen_2026_about',
         'title' => 'About page',
         'fields' => silkscreen_about_fields(),
@@ -387,26 +366,6 @@ add_filter('acf/load_value/name=contact_intro', function ($value, $post_id, $fie
     return SILKSCREEN_CONTACT_INTRO;
 }, 10, 3);
 
-add_filter('acf/load_value', function ($value, $post_id, $field) {
-    if (!is_array($field) || empty($field['name'])) {
-        return $value;
-    }
-    if (get_post_meta($post_id, '_wp_page_template', true) !== 'page-contact.php') {
-        return $value;
-    }
-    if ($value !== null && $value !== '') {
-        return $value;
-    }
-    if (!preg_match('/^contact_email_([1-3])_(label|address)$/', $field['name'], $matches)) {
-        return $value;
-    }
-    $defaults = silkscreen_default_contact_emails();
-    $slot = (int) $matches[1] - 1;
-    if (!isset($defaults[$slot])) {
-        return $value;
-    }
-    return $matches[2] === 'label' ? $defaults[$slot]['label'] : $defaults[$slot]['address'];
-}, 10, 3);
 
 add_filter('acf/load_value/name=about_statement', function ($value, $post_id, $field) {
     if ($value !== null && $value !== '') {

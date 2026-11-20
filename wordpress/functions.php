@@ -9,8 +9,11 @@ require get_template_directory() . '/inc/news.php';
 require get_template_directory() . '/inc/shop.php';
 require get_template_directory() . '/inc/fields.php';
 require get_template_directory() . '/inc/admin-cleanup.php';
+require get_template_directory() . '/inc/admin-reorder-ui.php';
 require get_template_directory() . '/inc/admin-project-credits.php';
 require get_template_directory() . '/inc/admin-project-stills.php';
+require get_template_directory() . '/inc/admin-project-posters.php';
+require get_template_directory() . '/inc/admin-contact-emails.php';
 require get_template_directory() . '/inc/seed-demo.php';
 require get_template_directory() . '/inc/admin-demo.php';
 

@@ -1,23 +1,20 @@
 <?php
 
 function silkscreen_contact_emails_from_post($post_id) {
-    if (!$post_id || !function_exists('get_field')) {
+    if (!$post_id) {
         return array();
     }
 
-    $emails = array();
-    for ($slot = 1; $slot <= SILKSCREEN_CONTACT_PRIMARY_SLOTS; $slot++) {
-        $address = trim(silkscreen_text('contact_email_' . $slot . '_address', $post_id, ''));
-        if ($address === '') {
-            continue;
-        }
-        $emails[] = array(
-            'label' => silkscreen_text('contact_email_' . $slot . '_label', $post_id, ''),
-            'address' => $address,
-        );
+    if (metadata_exists('post', $post_id, SILKSCREEN_CONTACT_EMAILS_META)) {
+        $rows = silkscreen_contact_email_rows_from_meta($post_id);
+        return array_values(array_filter($rows, function ($row) {
+            return !empty($row['address']);
+        }));
     }
 
-    return $emails;
+    return array_values(array_filter(silkscreen_contact_legacy_email_rows($post_id), function ($row) {
+        return !empty($row['address']);
+    }));
 }
 
 function silkscreen_settings() {
@@ -42,6 +39,32 @@ function silkscreen_settings() {
     );
 
     return $settings;
+}
+
+function silkscreen_posters_page_id() {
+    static $page_id = null;
+    if ($page_id !== null) {
+        return $page_id;
+    }
+    $pages = get_posts(array(
+        'post_type' => 'page',
+        'post_status' => array('publish', 'draft', 'private'),
+        'posts_per_page' => 1,
+        'meta_key' => '_wp_page_template',
+        'meta_value' => 'page-posters.php',
+        'no_found_rows' => true,
+        'fields' => 'ids',
+    ));
+    $page_id = $pages ? (int) $pages[0] : 0;
+    return $page_id;
+}
+
+function silkscreen_posters_in_menu() {
+    $page_id = silkscreen_posters_page_id();
+    if (!$page_id || !metadata_exists('post', $page_id, 'posters_in_menu')) {
+        return true;
+    }
+    return silkscreen_bool('posters_in_menu', $page_id, true);
 }
 
 function silkscreen_about_page_id() {

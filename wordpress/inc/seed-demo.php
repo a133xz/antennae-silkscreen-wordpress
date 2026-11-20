@@ -203,6 +203,7 @@ function silkscreen_import_demo_data(array $options = array()) {
         update_field('contact_email_' . $slot . '_label', $row['label'], $contact_id);
         update_field('contact_email_' . $slot . '_address', $row['address'], $contact_id);
     }
+    update_post_meta($contact_id, SILKSCREEN_CONTACT_EMAILS_META, wp_json_encode(array_values($s['emails']), JSON_UNESCAPED_UNICODE));
     update_field('copyright', $s['copyright'], $home_id);
     update_field('social_handle', $s['social_handle'], $home_id);
     update_field('social_url', $s['social_url'], $home_id);
@@ -268,6 +269,9 @@ function silkscreen_import_demo_data(array $options = array()) {
             $poster_id = silkscreen_seed_attach($row['poster'], $row['poster_alt'] ?? ($row['title'] . ' poster'), $log);
             if ($poster_id) {
                 update_field('poster', $poster_id, $post_id);
+                if (!empty($row['on_posters'])) {
+                    update_post_meta($post_id, SILKSCREEN_PROJECT_POSTERS_META, wp_json_encode(array($poster_id)));
+                }
             }
         }
 

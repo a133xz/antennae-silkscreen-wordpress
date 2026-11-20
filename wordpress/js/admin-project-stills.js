@@ -1,8 +1,20 @@
 (function ($) {
   const cfg = typeof silkscreenStills === 'object' ? silkscreenStills : { max: 5 };
+  const reorder = window.silkscreenAdminRowReorder || {};
+  const itemSelector = '[data-ss-still-row]';
 
   function countRows($root) {
-    return $root.find('[data-ss-still-row]').length;
+    return $root.find(itemSelector).length;
+  }
+
+  function rowsList($root) {
+    return $root.find('[data-ss-stills-rows]');
+  }
+
+  function refreshOrder($root) {
+    if (typeof reorder.refresh === 'function') {
+      reorder.refresh(rowsList($root), itemSelector);
+    }
   }
 
   function openPicker(onSelect) {
@@ -35,7 +47,9 @@
     }
   }
 
-  function bindRow($row) {
+  function bindRow($root, $row) {
+    const $list = rowsList($root);
+
     $row.find('[data-ss-still-pick]').on('click', function (e) {
       e.preventDefault();
       openPicker(function (attachment) {
@@ -45,11 +59,16 @@
     $row.find('[data-ss-still-remove]').on('click', function (e) {
       e.preventDefault();
       $row.remove();
+      refreshOrder($root);
     });
+
+    if (typeof reorder.bind === 'function') {
+      reorder.bind($row, $list, itemSelector);
+    }
   }
 
   function addRow($root) {
-    const $rows = $root.find('[data-ss-stills-rows]');
+    const $rows = rowsList($root);
     if (countRows($root) >= (cfg.max || 5)) {
       return;
     }
@@ -59,7 +78,8 @@
     }
     const node = tpl.content.cloneNode(true);
     $rows.append(node);
-    bindRow($rows.children().last());
+    bindRow($root, $rows.children().last());
+    refreshOrder($root);
   }
 
   $(function () {
@@ -68,9 +88,11 @@
       return;
     }
 
-    $root.find('[data-ss-still-row]').each(function () {
-      bindRow($(this));
+    $root.find(itemSelector).each(function () {
+      bindRow($root, $(this));
     });
+
+    refreshOrder($root);
 
     $root.find('[data-ss-stills-add]').on('click', function (e) {
       e.preventDefault();

@@ -48,6 +48,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
     if (!$screen || $screen->post_type !== SILKSCREEN_PROJECT_POST_TYPE) {
         return;
     }
+    silkscreen_admin_enqueue_row_reorder($hook);
     $dir = get_template_directory();
     $uri = get_template_directory_uri();
     $script = $dir . '/js/admin-project-credits.js';
@@ -57,7 +58,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
     wp_enqueue_script(
         'silkscreen-project-credits',
         $uri . '/js/admin-project-credits.js',
-        array(),
+        array('jquery', 'silkscreen-admin-row-reorder'),
         filemtime($script),
         true
     );
@@ -73,7 +74,7 @@ function silkscreen_project_credits_meta_box(WP_Post $post) {
     $roles = silkscreen_credit_role_choices();
     ?>
     <p class="description" style="margin-top:0;">
-        Add credit lines for the project detail page. Names can be comma-separated or one per line.
+        Add credit lines for the project detail page. Use the arrows to reorder. Names can be comma-separated or one per line.
     </p>
     <div id="ss-project-credits" data-ss-credits-root>
         <div data-ss-credits-rows>
@@ -92,20 +93,26 @@ function silkscreen_project_credits_meta_box(WP_Post $post) {
     <template id="ss-credit-row-tpl">
         <?php silkscreen_project_credits_row_markup(array('role' => 'directed', 'custom_label' => '', 'names' => array()), $roles); ?>
     </template>
+    <?php silkscreen_admin_reorder_styles(); ?>
     <style>
         .ss-credit-row {
-            border: 1px solid #c3c4c7;
+            border: 1px solid #dcdcde;
+            border-radius: 6px;
             background: #fff;
             padding: 12px 12px 4px;
             margin: 0 0 12px;
-            max-width: 640px;
+            max-width: 760px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
         .ss-credit-row__head {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f1;
         }
+        .ss-credit-row__head strong { flex: 1; font-size: 13px; font-weight: 600; color: #1d2327; }
         .ss-credit-row label { display: block; font-weight: 600; margin: 8px 0 4px; }
         .ss-credit-row select,
         .ss-credit-row input[type="text"],
@@ -129,7 +136,10 @@ function silkscreen_project_credits_row_markup(array $row, array $roles) {
     <div class="ss-credit-row<?php echo $is_custom ? '' : ' ss-credit-row--custom-hidden'; ?>" data-ss-credit-row>
         <div class="ss-credit-row__head">
             <strong>Credit</strong>
-            <button type="button" class="button-link-delete" data-ss-credits-remove aria-label="Remove credit">Remove</button>
+            <div class="ss-admin-row-actions">
+                <?php silkscreen_admin_row_order_buttons(); ?>
+                <button type="button" class="button button-small" data-ss-credits-remove>Remove</button>
+            </div>
         </div>
         <label>Role</label>
         <select name="ss_credit_role[]" data-ss-credit-role>
@@ -155,6 +165,9 @@ add_action('save_post_' . SILKSCREEN_PROJECT_POST_TYPE, function ($post_id) {
         return;
     }
     if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    if (!isset($_POST['post_ID']) || (int) $_POST['post_ID'] !== (int) $post_id) {
         return;
     }
     $rows = silkscreen_project_credits_from_post_request();

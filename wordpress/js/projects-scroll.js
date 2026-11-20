@@ -4,55 +4,27 @@
   const count = Number(grid.dataset.count || '0');
   if (!count) return;
 
-  const PILE_TOP_DEFAULT = 275;
-  const PILE_STEP = 50;
-  const PILE_ROW_H = 55;
-  const PILE_GAP = 10;
-
   const titleCells = [...grid.querySelectorAll('.ss-pile-title-cell')];
-  const stickies = [...grid.querySelectorAll('[data-pile-sticky]')];
+  const stills = [...grid.querySelectorAll('[data-pile-still]')];
 
-  const pileStepAfter = (index, heights) => Math.max(PILE_STEP, (heights[index] || PILE_ROW_H) + PILE_GAP);
-  const pileStickyTop = (index, heights, pileTop) => {
-    let top = pileTop;
-    for (let k = 0; k < index; k += 1) top += pileStepAfter(k, heights);
-    return top;
-  };
-  const pileMarginBottom = (index, heights) => {
-    let mb = 0;
-    for (let k = index; k < count - 1; k += 1) mb += pileStepAfter(k, heights);
-    return mb;
-  };
+  grid.style.gridTemplateRows = `repeat(${count}, auto)`;
 
-  let pileTop = PILE_TOP_DEFAULT;
-
-  const measure = () => {
-    const heights = stickies.map((el) => Math.round(el.getBoundingClientRect().height));
-    if (window.scrollY === 0 && stickies[0]) {
-      const nextTop = Math.round(stickies[0].getBoundingClientRect().top);
-      if (nextTop > 0) pileTop = Math.max(PILE_TOP_DEFAULT, nextTop);
-    }
+  const place = () => {
     titleCells.forEach((cell, index) => {
       cell.style.gridColumn = '1';
-      cell.style.gridRow = `${index + 1} / -1`;
-      cell.style.marginBottom = `${pileMarginBottom(index, heights)}px`;
-      cell.style.zIndex = String(index + 1);
-      const sticky = stickies[index];
-      if (sticky) sticky.style.top = `${pileStickyTop(index, heights, pileTop)}px`;
+      cell.style.gridRow = String(index + 1);
     });
-    const stills = [...grid.querySelectorAll('[data-pile-still]')];
     stills.forEach((still, index) => {
       still.style.gridColumn = '2';
       still.style.gridRow = String(index + 1);
     });
+    const first = stills[0];
+    if (!first) return;
+    const line = Math.round(first.getBoundingClientRect().top + window.scrollY);
+    grid.style.setProperty('--pile-stick', line + 'px');
   };
 
-  grid.style.gridTemplateRows = `repeat(${count}, auto)`;
-  stickies.forEach((el) => {
-    el.style.position = 'sticky';
-  });
-
-  measure();
-  window.addEventListener('resize', measure);
-  window.addEventListener('scroll', measure, { passive: true });
+  place();
+  window.addEventListener('resize', place);
+  window.addEventListener('load', place);
 })();

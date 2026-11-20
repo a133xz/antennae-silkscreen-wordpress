@@ -9,7 +9,7 @@ $ss_theme = 'light';
 $synopsis = silkscreen_project_detail_synopsis($project);
 $stills = silkscreen_project_detail_stills($project);
 $credits = silkscreen_project_detail_credits($project);
-$poster = $project['poster'] ?: $project['image'];
+$poster = $project['poster'];
 $detail_actions = silkscreen_project_actions_for_detail($project);
 require get_template_directory() . '/template-parts/document-open.php';
 ?>

@@ -105,15 +105,15 @@ function silkscreen_project_still_attachment_ids($post_id) {
         return array();
     }
 
-    $json = get_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, true);
-    if (is_string($json) && $json !== '') {
-        $ids = json_decode($json, true);
-        if (is_array($ids)) {
-            $ids = array_values(array_filter(array_map('intval', $ids)));
-            if ($ids) {
-                return $ids;
+    if (metadata_exists('post', $post_id, SILKSCREEN_PROJECT_STILLS_META)) {
+        $json = get_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, true);
+        if (is_string($json) && $json !== '') {
+            $ids = json_decode($json, true);
+            if (is_array($ids)) {
+                return array_values(array_filter(array_map('intval', $ids)));
             }
         }
+        return array();
     }
 
     if (!function_exists('get_field')) {
@@ -144,12 +144,69 @@ function silkscreen_project_still_attachment_ids($post_id) {
     return array();
 }
 
+function silkscreen_project_poster_attachment_ids($post_id) {
+    if (!$post_id) {
+        return array();
+    }
+
+    if (metadata_exists('post', $post_id, SILKSCREEN_PROJECT_POSTERS_META)) {
+        $json = get_post_meta($post_id, SILKSCREEN_PROJECT_POSTERS_META, true);
+        if (is_string($json) && $json !== '') {
+            $ids = json_decode($json, true);
+            if (is_array($ids)) {
+                return array_values(array_filter(array_map('intval', $ids)));
+            }
+        }
+        return array();
+    }
+
+    if (!function_exists('get_field')) {
+        return array();
+    }
+
+    $value = get_field('poster', $post_id);
+    if (is_array($value) && !empty($value['ID'])) {
+        return array((int) $value['ID']);
+    }
+    if (is_numeric($value) && (int) $value > 0) {
+        return array((int) $value);
+    }
+
+    return array();
+}
+
+function silkscreen_project_posters($post_id) {
+    if (!$post_id) {
+        return array();
+    }
+
+    $out = array();
+    foreach (silkscreen_project_poster_attachment_ids($post_id) as $attachment_id) {
+        $picture = silkscreen_picture_from_attachment($attachment_id);
+        if ($picture) {
+            $out[] = $picture;
+        }
+    }
+    return $out;
+}
+
 /**
  * Project detail slider stills.
  */
 function silkscreen_project_stills($post_id) {
     if (!$post_id) {
         return array();
+    }
+
+    if (metadata_exists('post', $post_id, SILKSCREEN_PROJECT_STILLS_META)) {
+        $out = array();
+        foreach (silkscreen_project_still_attachment_ids($post_id) as $attachment_id) {
+            $picture = silkscreen_picture_from_attachment($attachment_id);
+            if ($picture) {
+                $out[] = $picture;
+            }
+        }
+        return $out;
     }
 
     $out = array();
@@ -319,9 +376,13 @@ function silkscreen_gallery($name, $post_id) {
 function silkscreen_bool($name, $post_id, $fallback = false) {
     if ($post_id && function_exists('get_field')) {
         $value = get_field($name, $post_id);
-        if ($value !== null && $value !== '') {
-            return (bool) $value;
+        if ($value === null || $value === '') {
+            return (bool) $fallback;
         }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), array('1', 'true', 'yes', 'on'), true);
+        }
+        return (bool) $value;
     }
     return (bool) $fallback;
 }

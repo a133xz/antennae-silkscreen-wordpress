@@ -19,6 +19,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
     if (!$screen || $screen->post_type !== SILKSCREEN_PROJECT_POST_TYPE) {
         return;
     }
+    silkscreen_admin_enqueue_row_reorder($hook);
     wp_enqueue_media();
     $dir = get_template_directory();
     $uri = get_template_directory_uri();
@@ -29,7 +30,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
     wp_enqueue_script(
         'silkscreen-project-stills',
         $uri . '/js/admin-project-stills.js',
-        array('jquery'),
+        array('jquery', 'silkscreen-admin-row-reorder'),
         filemtime($script),
         true
     );
@@ -45,7 +46,7 @@ function silkscreen_project_stills_meta_box(WP_Post $post) {
     $ids = silkscreen_project_still_attachment_ids($post->ID);
     ?>
     <p class="description" style="margin-top:0;">
-        Images for the project detail slider, in order. Up to <?php echo (int) SILKSCREEN_PROJECT_STILL_SLOTS; ?> stills.
+        Images for the project detail slider, in order. Use the arrows to reorder. Up to <?php echo (int) SILKSCREEN_PROJECT_STILL_SLOTS; ?> stills.
     </p>
     <div id="ss-project-stills" data-ss-stills-root>
         <ul class="ss-still-rows" data-ss-stills-rows>
@@ -64,16 +65,19 @@ function silkscreen_project_stills_meta_box(WP_Post $post) {
     <template id="ss-still-row-tpl">
         <?php silkscreen_project_still_row_markup(0); ?>
     </template>
+    <?php silkscreen_admin_reorder_styles(); ?>
     <style>
-        .ss-still-rows { list-style: none; margin: 0; padding: 0; max-width: 640px; }
+        .ss-still-rows { list-style: none; margin: 0; padding: 0; max-width: 760px; }
         .ss-still-row {
             display: flex;
             align-items: center;
             gap: 12px;
-            border: 1px solid #c3c4c7;
+            border: 1px solid #dcdcde;
+            border-radius: 6px;
             background: #fff;
             padding: 10px 12px;
             margin: 0 0 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
         .ss-still-row__thumb {
             width: 80px;
@@ -84,7 +88,6 @@ function silkscreen_project_stills_meta_box(WP_Post $post) {
         }
         .ss-still-row__thumb--empty { display: block; }
         .ss-still-row__meta { flex: 1; min-width: 0; font-size: 12px; color: #50575e; }
-        .ss-still-row__actions { flex-shrink: 0; }
     </style>
     <?php
 }
@@ -101,9 +104,10 @@ function silkscreen_project_still_row_markup($attachment_id) {
             <span class="ss-still-row__thumb ss-still-row__thumb--empty" data-ss-still-preview aria-hidden="true"></span>
         <?php endif; ?>
         <div class="ss-still-row__meta" data-ss-still-label><?php echo esc_html($title ?: 'No image selected'); ?></div>
-        <div class="ss-still-row__actions">
-            <button type="button" class="button button-small" data-ss-still-pick>Choose</button>
-            <button type="button" class="button-link-delete" data-ss-still-remove>Remove</button>
+        <div class="ss-admin-row-actions">
+            <?php silkscreen_admin_row_order_buttons(); ?>
+            <button type="button" class="button button-secondary button-small" data-ss-still-pick>Choose</button>
+            <button type="button" class="button button-small" data-ss-still-remove>Remove</button>
         </div>
         <input type="hidden" name="ss_project_still_ids[]" value="<?php echo (int) $attachment_id; ?>" data-ss-still-id />
     </li>
@@ -120,6 +124,9 @@ add_action('save_post_' . SILKSCREEN_PROJECT_POST_TYPE, function ($post_id) {
     if (!current_user_can('edit_post', $post_id)) {
         return;
     }
+    if (!isset($_POST['post_ID']) || (int) $_POST['post_ID'] !== (int) $post_id) {
+        return;
+    }
 
     $ids = array();
     if (!empty($_POST['ss_project_still_ids']) && is_array($_POST['ss_project_still_ids'])) {
@@ -134,9 +141,5 @@ add_action('save_post_' . SILKSCREEN_PROJECT_POST_TYPE, function ($post_id) {
         }
     }
 
-    if ($ids) {
-        update_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, wp_json_encode($ids));
-    } else {
-        delete_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META);
-    }
+    update_post_meta($post_id, SILKSCREEN_PROJECT_STILLS_META, wp_json_encode($ids));
 }, 10, 1);

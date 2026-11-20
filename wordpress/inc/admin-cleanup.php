@@ -200,7 +200,6 @@ function silkscreen_project_side_meta_boxes() {
     return array(
         'submitdiv',
         'acf-group_silkscreen_2026_project_sidebar',
-        'acf-group_silkscreen_2026_project_list_still',
     );
 }
 
@@ -211,8 +210,28 @@ function silkscreen_news_side_meta_boxes() {
     );
 }
 
+function silkscreen_place_meta_box_before($order, $box_id, $before_id) {
+    if (!is_array($order)) {
+        $order = array('side' => '', 'normal' => '', 'advanced' => '');
+    }
+    $normal = array();
+    if (!empty($order['normal']) && is_string($order['normal'])) {
+        $normal = array_values(array_filter(array_map('trim', explode(',', $order['normal']))));
+    }
+    $normal = array_values(array_diff($normal, array($box_id)));
+    $index = array_search($before_id, $normal, true);
+    if ($index === false) {
+        $normal[] = $box_id;
+    } else {
+        array_splice($normal, $index, 0, array($box_id));
+    }
+    $order['normal'] = implode(',', $normal);
+    return $order;
+}
+
 add_filter('get_user_option_meta-box-order_' . SILKSCREEN_PROJECT_POST_TYPE, function ($order) {
-    return silkscreen_merge_side_meta_box_order($order, silkscreen_project_side_meta_boxes());
+    $order = silkscreen_merge_side_meta_box_order($order, silkscreen_project_side_meta_boxes());
+    return silkscreen_place_meta_box_before($order, 'silkscreen_project_posters', 'silkscreen_project_credits');
 });
 
 add_filter('get_user_option_meta-box-order_' . SILKSCREEN_NEWS_POST_TYPE, function ($order) {
@@ -226,7 +245,6 @@ add_action('do_meta_boxes', function ($post_type, $context = null) {
     if ($post_type === SILKSCREEN_PROJECT_POST_TYPE) {
         silkscreen_pin_side_meta_boxes_below_publish($post_type, array(
             'acf-group_silkscreen_2026_project_sidebar',
-            'acf-group_silkscreen_2026_project_list_still',
         ));
     }
     if ($post_type === SILKSCREEN_NEWS_POST_TYPE) {

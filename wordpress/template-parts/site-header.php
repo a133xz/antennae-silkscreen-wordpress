@@ -6,7 +6,9 @@ if (silkscreen_shop_available()) {
     $primary[] = array('href' => silkscreen_shop_url(), 'label' => 'Shop');
 }
 $primary[] = array('href' => home_url('/news/'), 'label' => 'News');
-$primary[] = array('href' => home_url('/posters/'), 'label' => 'Posters');
+if (silkscreen_posters_in_menu()) {
+    $primary[] = array('href' => home_url('/posters/'), 'label' => 'Posters');
+}
 $secondary = array(
     array('href' => home_url('/about/'), 'label' => 'About'),
     array('href' => silkscreen_contact_url(), 'label' => 'Contact'),

@@ -12,6 +12,8 @@ $size = isset($item['size']) ? $item['size'] : 'medium';
 list($w, $h) = silkscreen_news_frame_dimensions($size);
 $kicker = trim(strtolower($item['kicker'] ?? '') . '  ' . ($item['date_label'] ?? ''));
 $has_excerpt = !empty($item['excerpt']);
+$link = !empty($item['url']) ? $item['url'] : '';
+$link_external = $link !== '' && preg_match('#^https?://#i', $link);
 $card_class = 'ss-news-card';
 if ($has_excerpt) {
     $card_class .= ' ss-news-card--has-excerpt';
@@ -21,6 +23,9 @@ if ($scroll_reveal) {
 }
 ?>
 <article class="<?php echo esc_attr($card_class); ?>"<?php echo $scroll_reveal ? ' data-inview="false"' : ''; ?>>
+    <?php if ($link) : ?>
+        <a class="ss-news-card__link" href="<?php echo esc_url($link); ?>"<?php echo $link_external ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
+    <?php endif; ?>
     <?php if (!empty($item['image']['src'])) : ?>
         <img src="<?php echo esc_url($item['image']['src']); ?>" alt="<?php echo esc_attr($item['image']['alt']); ?>" width="<?php echo (int) $w; ?>" height="<?php echo (int) $h; ?>" loading="lazy" />
     <?php endif; ?>
@@ -35,4 +40,7 @@ if ($scroll_reveal) {
             <p class="ss-news-card__excerpt"><?php echo esc_html($item['excerpt']); ?></p>
         <?php endif; ?>
     </div>
+    <?php if ($link) : ?>
+        </a>
+    <?php endif; ?>
 </article>

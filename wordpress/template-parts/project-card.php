@@ -24,7 +24,8 @@ $meta_class = 'ss-project-meta' . ($home_featured ? ' ss-project-meta--home' : '
             <<?php echo tag_escape($title_tag); ?> class="ss-title font-display"><?php echo esc_html($project['title']); ?></<?php echo tag_escape($title_tag); ?>>
             <?php if (!empty($project['director'])) : ?>
                 <p class="ss-directed">
-                    <em class="ss-directed__lead">Directed by </em><?php echo esc_html($project['director']); ?>
+                    <em class="ss-directed__lead">Directed by</em>
+                    <span class="ss-directed__name"><?php echo esc_html($project['director']); ?></span>
                 </p>
             <?php endif; ?>
         </div>

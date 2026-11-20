@@ -8,7 +8,6 @@ $bug_src = esc_url(silkscreen_asset('brand/bug.svg'));
             <a href="<?php echo esc_url($settings['social_url']); ?>" target="_blank" rel="noopener noreferrer">
                 <?php echo esc_html($settings['social_handle']); ?>
             </a>
-            <span class="ss-footer__sep" aria-hidden="true">/</span>
             <p><?php echo esc_html($settings['copyright']); ?></p>
         </div>
         <span

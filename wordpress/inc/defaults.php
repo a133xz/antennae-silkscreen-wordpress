@@ -7,6 +7,8 @@ const SILKSCREEN_SOCIAL_URL = 'https://instagram.com/silkscreen_ent';
 const SILKSCREEN_CONTACT_INTRO = 'If you would like to get in touch, you can reach us at the addresses below.';
 
 const SILKSCREEN_CONTACT_PRIMARY_SLOTS = 3;
+const SILKSCREEN_CONTACT_EMAILS_META = 'silkscreen_contact_emails';
+const SILKSCREEN_CONTACT_EMAIL_MAX = 12;
 
 function silkscreen_default_contact_emails() {
     return array(
@@ -28,8 +30,10 @@ function silkscreen_default_hero_slides() {
 }
 
 const SILKSCREEN_PROJECT_STILL_SLOTS = 5;
+const SILKSCREEN_PROJECT_POSTER_SLOTS = 5;
 const SILKSCREEN_PROJECT_CREDITS_META = 'silkscreen_project_credits';
 const SILKSCREEN_PROJECT_STILLS_META = 'silkscreen_project_stills';
+const SILKSCREEN_PROJECT_POSTERS_META = 'silkscreen_project_posters';
 
 const SILKSCREEN_PROJECT_POST_TYPE = 'silkscreen_project';
 const SILKSCREEN_NEWS_POST_TYPE = 'silkscreen_news';

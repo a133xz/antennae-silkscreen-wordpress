@@ -31,6 +31,7 @@ function silkscreen_news_from_post(WP_Post $post) {
         'image' => $image,
         'size' => $size,
         'excerpt' => $excerpt,
+        'url' => function_exists('get_field') ? esc_url_raw((string) get_field('news_url', $id)) : '',
         'featured' => silkscreen_bool('featured', $id, false),
         'order' => (int) $post->menu_order,
     );
@@ -41,7 +42,7 @@ function silkscreen_news_query($args = array()) {
         'post_type' => SILKSCREEN_NEWS_POST_TYPE,
         'post_status' => 'publish',
         'posts_per_page' => -1,
-        'orderby' => 'menu_order',
+        'orderby' => 'menu_order title',
         'order' => 'ASC',
     );
     $query = new WP_Query(array_merge($defaults, $args));
@@ -68,6 +69,7 @@ function silkscreen_news_sync_headline_to_post($value, $post_id) {
     wp_update_post(array(
         'ID' => $post_id,
         'post_title' => is_string($value) ? $value : '',
+        'menu_order' => (int) get_post_field('menu_order', $post_id),
     ));
     add_filter('acf/update_value/name=news_headline', 'silkscreen_news_sync_headline_to_post', 10, 2);
     return null;
@@ -89,6 +91,7 @@ function silkscreen_news_sync_excerpt_to_post($value, $post_id) {
     wp_update_post(array(
         'ID' => $post_id,
         'post_excerpt' => is_string($value) ? $value : '',
+        'menu_order' => (int) get_post_field('menu_order', $post_id),
     ));
     add_filter('acf/update_value/name=news_excerpt', 'silkscreen_news_sync_excerpt_to_post', 10, 2);
     return null;
@@ -96,20 +99,8 @@ function silkscreen_news_sync_excerpt_to_post($value, $post_id) {
 add_filter('acf/update_value/name=news_excerpt', 'silkscreen_news_sync_excerpt_to_post', 10, 2);
 
 function silkscreen_featured_news($limit = 3) {
-    $all = silkscreen_news_query();
-    $featured = array_values(array_filter($all, function ($item) {
+    $featured = array_values(array_filter(silkscreen_news_query(), function ($item) {
         return !empty($item['featured']);
     }));
-    if (count($featured) < $limit) {
-        foreach ($all as $item) {
-            if (count($featured) >= $limit) {
-                break;
-            }
-            if (in_array($item, $featured, true)) {
-                continue;
-            }
-            $featured[] = $item;
-        }
-    }
     return array_slice($featured, 0, $limit);
 }
