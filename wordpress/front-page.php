@@ -41,7 +41,7 @@ require get_template_directory() . '/template-parts/document-open.php';
                 $action_below_md = true;
                 $layout_split_two = true;
                 require get_template_directory() . '/template-parts/section-header.php';
-                get_template_part('template-parts/news-masonry', null, array('items' => $news, 'title_tag' => 'h3'));
+                get_template_part('template-parts/news-masonry', null, array('items' => $news, 'title_tag' => 'h3', 'home_layout' => true));
                 ?>
                 <div class="ss-section-action-below">
                     <?php get_template_part('template-parts/text-link', null, array('href' => home_url('/news/'), 'label' => 'View all news')); ?>

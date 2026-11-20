@@ -98,6 +98,9 @@ function silkscreen_news_sync_excerpt_to_post($value, $post_id) {
 }
 add_filter('acf/update_value/name=news_excerpt', 'silkscreen_news_sync_excerpt_to_post', 10, 2);
 
+/**
+ * Home shows featured news in Order. Size sets each column span.
+ */
 function silkscreen_featured_news($limit = 3) {
     $featured = array_values(array_filter(silkscreen_news_query(), function ($item) {
         return !empty($item['featured']);

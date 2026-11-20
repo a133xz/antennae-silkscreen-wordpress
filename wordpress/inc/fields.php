@@ -146,6 +146,7 @@ function silkscreen_news_sidebar_fields() {
             'type' => 'select',
             'choices' => silkscreen_news_tile_size_choices(),
             'default_value' => 'medium',
+            'instructions' => 'Column width on the news page. The home page keeps a fixed row: smaller, wider, smallest.',
         ),
         array(
             'key' => 'field_ss_news_featured',
